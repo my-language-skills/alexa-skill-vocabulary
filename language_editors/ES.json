@@ -1,0 +1,575 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "spanish vocabulary",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelpIntent",
+                    "slots": [
+                        {
+                            "name": "help_options",
+                            "type": "help_options_list"
+                        }
+                    ],
+                    "samples": [
+                        "{help_options}"
+                    ]
+                },
+                {
+                    "name": "ShowCategories",
+                    "slots": [
+                        {
+                            "name": "category",
+                            "type": "categories_list"
+                        },
+                        {
+                            "name": "option",
+                            "type": "option_list"
+                        }
+                    ],
+                    "samples": [
+                        "{option}",
+                        "show {option}",
+                        "{option} list",
+                        "show all {option}",
+                        "{category} subcategories",
+                        "{category} list",
+                        "{category}"
+                    ]
+                },
+                {
+                    "name": "RepeatMessageIntent",
+                    "slots": [
+                        {
+                            "name": "Repeat",
+                            "type": "Repeat_List"
+                        },
+                        {
+                            "name": "speed",
+                            "type": "speed_list"
+                        },
+                        {
+                            "name": "volume",
+                            "type": "volume_list"
+                        }
+                    ],
+                    "samples": [
+                        "{Repeat}",
+                        "{Repeat} {speed}",
+                        "{Repeat} {volume}",
+                        "{speed}",
+                        "{volume}"
+                    ]
+                },
+                {
+                    "name": "SelectCategoryIntent",
+                    "slots": [
+                        {
+                            "name": "category",
+                            "type": "categories_list"
+                        },
+                        {
+                            "name": "random",
+                            "type": "random_list"
+                        },
+                        {
+                            "name": "subcategory",
+                            "type": "sub_categories_list"
+                        },
+                        {
+                            "name": "continue_",
+                            "type": "continue_in_cat_list"
+                        },
+                        {
+                            "name": "random_option",
+                            "type": "random_option_list"
+                        }
+                    ],
+                    "samples": [
+                        "{category} {subcategory}",
+                        "{subcategory} {category}",
+                        "{subcategory}",
+                        "{subcategory} of {category}",
+                        "{random} {category}",
+                        "{random} {random_option}",
+                        "{random_option} {random}",
+                        "{category} {random}",
+                        "{category} {random} subcategory",
+                        "{category} subcategory {random}",
+                        "{continue_}"
+                    ]
+                },
+                {
+                    "name": "ExampleIntent",
+                    "slots": [
+                        {
+                            "name": "continue",
+                            "type": "continue_in_sub_list"
+                        },
+                        {
+                            "name": "random",
+                            "type": "random_list"
+                        }
+                    ],
+                    "samples": [
+                        "{random}",
+                        "{continue}",
+                        "{random} {continue}",
+                        "{continue} {random}",
+                        "{continue} subcategory",
+                        "subcategory {continue}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "DetailsIntent",
+                    "slots": [
+                        {
+                            "name": "detail",
+                            "type": "details_list"
+                        },
+                        {
+                            "name": "language",
+                            "type": "language_list"
+                        }
+                    ],
+                    "samples": [
+                        "{detail}",
+                        "{language} {detail}"
+                    ]
+                },
+                {
+                    "name": "IndexIntent",
+                    "slots": [
+                        {
+                            "name": "request",
+                            "type": "request_list"
+                        }
+                    ],
+                    "samples": [
+                        "{request}",
+                        "what is my {request}",
+                        "show me {request}",
+                        "show"
+                    ]
+                },
+                {
+                    "name": "LanguageSelectionIntent",
+                    "slots": [
+                        {
+                            "name": "language",
+                            "type": "language_list"
+                        },
+                        {
+                            "name": "language_type",
+                            "type": "language_type_list"
+                        }
+                    ],
+                    "samples": [
+                        "learn {language}",
+                        "change {language_type} language to {language}",
+                        "{language_type} language to {language}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "language_type_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "native"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "mother"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "teaching"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "second"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "learning"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "categories_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "nociones existenciales",
+                                "synonyms": ["existential notions"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "nociones cuantitativas",
+                                "synonyms": ["quantitative"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "speed_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "faster"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "slower"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "volume_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "louder"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "quieter"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "help_options_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "help"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "instructions"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "options"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "request_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "current category"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current subcategory"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current example"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "native language"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "mother language"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "learning language"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "language list"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "details_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "translation"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "word"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "phrase"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "continue_in_sub_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "more"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "another"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "next"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "reset"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "restart"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "start"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "language_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "english"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "spanish"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "italian"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "french"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "german"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "continue_in_cat_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "next category"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "another category"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "option_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "categories"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "subcategories"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "index"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "random_option_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "category"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "subcategory"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Repeat_List",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "repeat"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "again"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "repeat again"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "repeat normal"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "sub_categories_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "existence, lack of existence",
+                                "synonyms": ["Existencia, inexistencia"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "presence, absence",
+                                "synonyms": ["Presencia, ausencia"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "general quality",
+                                "synonyms": ["Cualidad general"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "event",
+                                "synonyms": ["Acontecimiento"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "certainty, uncertainty",
+                                "synonyms": ["Certeza, incertidumbre"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "numerical quantity",
+                                "synonyms": ["Numerical quantity"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "cardinal numbers",
+                                "synonyms": ["Números cardinales"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "ordinal numbers",
+                                "synonyms": ["Números ordinales"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "relative quantity",
+                                "synonyms": ["Cantidad relativa"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "degree",
+                                "synonyms": ["Grado"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "random_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "random"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "shuffle"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
