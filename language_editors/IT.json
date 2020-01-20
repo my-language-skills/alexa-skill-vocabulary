@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "italian vocabulary",
+            "invocationName": "lexicon",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
@@ -9,10 +9,6 @@
                 },
                 {
                     "name": "AMAZON.CancelIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.HelpIntent",
                     "samples": []
                 },
                 {
@@ -46,10 +42,26 @@
                     "samples": [
                         "{option}",
                         "show {option}",
+                        "demostrar {option}",
+                        "démontrer {option}",
+                        "zeigen {option}",
+                        "mostrare {option}",
                         "{option} list",
+                        "{option} Liste",
+                        "{option} lista",
                         "show all {option}",
+                        "mostrar todo {option}",
+                        "Afficher tout {option}",
+                        "zeige alles {option}",
+                        "mostra tutto {option}",
                         "{category} subcategories",
+                        "{category} subcategorias",
+                        "{category} sous-catégories",
+                        "{category} Unterkategorien",
+                        "{category} sottocategorie",
                         "{category} list",
+                        "{category} lista",
+                        "{category} liste",
                         "{category}"
                     ]
                 },
@@ -169,7 +181,10 @@
                         "{request}",
                         "what is my {request}",
                         "show me {request}",
-                        "show"
+                        "Muéstrame {request}",
+                        "montre moi {request}",
+                        "Zeig es mir {request}",
+                        "fammi vedere {request}"
                     ]
                 },
                 {
@@ -186,8 +201,20 @@
                     ],
                     "samples": [
                         "learn {language}",
+                        "aprender {language}",
+                        "apprendre {language}",
+                        "lernen {language}",
+                        "imparare {language}",
                         "change {language_type} language to {language}",
-                        "{language_type} language to {language}"
+                        "Cambia  {language_type} lingua to {language}",
+                        "ändere {language_type} Sprache to {language}",
+                        "cambio {language_type} lengua to {language}",
+                        "changer  {language_type} langue  to {language}",
+                        "{language_type} language to {language}",
+                        "{language_type} lingua to {language}",
+                        "{language_type} Sprache to {language}",
+                        "{language_type} lengua to {language}",
+                        "{language_type} langue to {language}"
                     ]
                 }
             ],
@@ -197,27 +224,32 @@
                     "values": [
                         {
                             "name": {
-                                "value": "native"
+                                "value": "native",
+                                "synonyms": ["nativa", "local","gebürtig","nativa"]
                             }
                         },
                         {
                             "name": {
-                                "value": "mother"
+                                "value": "mother",
+                                "synonyms": ["madre","mère","Mutter", "madre"]
                             }
                         },
                         {
                             "name": {
-                                "value": "teaching"
+                                "value": "teaching",
+                                "synonyms": ["enseñando","enseignement","Lehren","insegnamento"]
                             }
                         },
                         {
                             "name": {
-                                "value": "second"
+                                "value": "second",
+                                "synonyms": ["segunda","seconde","zweite","seconda"]
                             }
                         },
                         {
                             "name": {
-                                "value": "learning"
+                                "value": "learning",
+                                "synonyms": ["aprendizaje", "seconde","Lernen","apprendimento"]
                             }
                         }
                     ]
@@ -227,14 +259,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "nociones existenciales",
-                                "synonyms": ["existential notions"]
+                                "value": "existential notions",
+                                "synonyms": ["NOCIONES EXISTENCIALES"]
                             }
                         },
                         {
                             "name": {
-                                "value": "nociones cuantitativas",
-                                "synonyms": ["quantitative"]
+                                "value": "quantitative",
+                                "synonyms": ["NOCIONES CUANTITATIVAS"]
                             }
                         }
                     ]
@@ -244,12 +276,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "faster"
+                                "value": "faster",
+                                "synonyms": ["más rápido","plus rapide","schneller","Più veloce"]
                             }
                         },
                         {
                             "name": {
-                                "value": "slower"
+                                "value": "slower",
+                                "synonyms": ["más lento","Ralentissez","Langsamer","Più lentamente"]
                             }
                         }
                     ]
@@ -259,12 +293,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "louder"
+                                "value": "louder",
+                                "synonyms": ["mas fuerte","Plus fort","lauter","più forte"]
                             }
                         },
                         {
                             "name": {
-                                "value": "quieter"
+                                "value": "quieter",
+                                "synonyms": ["más tranquilo","plus tranquille","leiser","più tranquillo"]
                             }
                         }
                     ]
@@ -274,17 +310,20 @@
                     "values": [
                         {
                             "name": {
-                                "value": "help"
+                                "value": "help",
+                                "synonyms": ["ayuda","Aidez-moi","Hilfe","Aiuto"]
                             }
                         },
                         {
                             "name": {
-                                "value": "instructions"
+                                "value": "instructions",
+                                "synonyms": ["instrucciones","instructions","Anleitung","Istruzioni"]
                             }
                         },
                         {
                             "name": {
-                                "value": "options"
+                                "value": "options",
+                                "synonyms": ["opciones","options","Optionen","opzioni"]
                             }
                         }
                     ]
@@ -294,37 +333,50 @@
                     "values": [
                         {
                             "name": {
-                                "value": "current category"
+                                "value": "current category",
+                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle Kategorie","categoria attuale"]
                             }
                         },
                         {
                             "name": {
-                                "value": "current subcategory"
+                                "value": "current subcategory",
+                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle Unterkategorie","sottocategoria corrente"]
                             }
                         },
                         {
                             "name": {
-                                "value": "current example"
+                                "value": "current example",
+                                "synonyms": ["ejemplo actual","exemple actuel","aktuelles Beispiel","esempio attuale"]
                             }
                         },
                         {
                             "name": {
-                                "value": "native language"
+                                "value": "native language",
+                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","lingua nativa"]
                             }
                         },
                         {
                             "name": {
-                                "value": "mother language"
+                                "value": "mother language",
+                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","madre lingua"]
                             }
                         },
                         {
                             "name": {
-                                "value": "learning language"
+                                "value": "learning language",
+                                "synonyms": ["aprendiendo idioma","apprendre une langue","Sprache lernen","apprendimento della lingua"]
                             }
                         },
                         {
                             "name": {
-                                "value": "language list"
+                                "value": "language list",
+                                "synonyms": ["lista de idiomas","liste des langues","Sprachliste","elenco delle lingue"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "category list",
+                                "synonyms": ["Lista de categoría","liste des catégories","Kategorieliste","elenco di categorie"]
                             }
                         }
                     ]
@@ -334,17 +386,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "translation"
+                                "value": "word",
+                                "synonyms": ["palabra","mot","Wort","parola"]
                             }
                         },
                         {
                             "name": {
-                                "value": "word"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "phrase"
+                                "value": "phrase",
+                                "synonyms": ["frase","frase","Phrase","frase"]
                             }
                         }
                     ]
@@ -354,32 +403,20 @@
                     "values": [
                         {
                             "name": {
-                                "value": "more"
+                                "value": "another",
+                                "synonyms": ["Otro","autre","weiterer","altro"]
                             }
                         },
                         {
                             "name": {
-                                "value": "another"
+                                "value": "next",
+                                "synonyms": ["siguiente","suivant","Nächster","prossimo"]
                             }
                         },
                         {
                             "name": {
-                                "value": "next"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "reset"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "restart"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "start"
+                                "value": "start",
+                                "synonyms": ["comienzo","début","Start","inizio"]
                             }
                         }
                     ]
@@ -389,27 +426,32 @@
                     "values": [
                         {
                             "name": {
-                                "value": "english"
+                                "value": "english",
+                                "synonyms": ["inglés","Anglais","Englisch","inglese"]
                             }
                         },
                         {
                             "name": {
-                                "value": "spanish"
+                                "value": "spanish",
+                                "synonyms": ["español","Espagnol","Spanisch","spagnolo"]
                             }
                         },
                         {
                             "name": {
-                                "value": "italian"
+                                "value": "italian",
+                                "synonyms": ["italiano","italien","Italienisch","italiano"]
                             }
                         },
                         {
                             "name": {
-                                "value": "french"
+                                "value": "french",
+                                "synonyms": ["francés","Français","Französisch","francese"]
                             }
                         },
                         {
                             "name": {
-                                "value": "german"
+                                "value": "german",
+                                "synonyms": ["aleman","allemand","Deutsche","tedesca"]
                             }
                         }
                     ]
@@ -419,12 +461,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "next category"
+                                "value": "next category",
+                                "synonyms": ["siguiente categoría","catégorie suivante","nächste Kategorie","prossima categoria"]
                             }
                         },
                         {
                             "name": {
-                                "value": "another category"
+                                "value": "another category",
+                                "synonyms": ["otra categoría","autre catégorie","andere Kategorie","altra categoria"]
                             }
                         }
                     ]
@@ -434,17 +478,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "categories"
+                                "value": "categories",
+                                "synonyms": ["categorías","catégories","Kategorien","categorie"]
                             }
                         },
                         {
                             "name": {
-                                "value": "subcategories"
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "index"
+                                "value": "subcategories",
+                                "synonyms": ["subcategorias","sous-catégories","Unterkategorien","sottocategorie"]
                             }
                         }
                     ]
@@ -454,12 +495,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "category"
+                                "value": "category",
+                                "synonyms": ["categoría","Catégorie","Kategorie","categoria"]
                             }
                         },
                         {
                             "name": {
-                                "value": "subcategory"
+                                "value": "subcategory",
+                                "synonyms": ["subcategoría","sous-catégorie","Unterkategorie","sottocategoria"]
                             }
                         }
                     ]
@@ -469,22 +512,26 @@
                     "values": [
                         {
                             "name": {
-                                "value": "repeat"
+                                "value": "repeat",
+                                "synonyms": ["repetir","répéter","wiederholen","ripetere"]
                             }
                         },
                         {
                             "name": {
-                                "value": "again"
+                                "value": "again",
+                                "synonyms": ["otra vez","encore","nochmal","ancora"]
                             }
                         },
                         {
                             "name": {
-                                "value": "repeat again"
+                                "value": "repeat again",
+                                "synonyms": ["repite otra vez","répète encore","nochmals wiederholen","ripeti ancora"]
                             }
                         },
                         {
                             "name": {
-                                "value": "repeat normal"
+                                "value": "repeat normal",
+                                "synonyms": ["repetir normal","répéter normal","wiederhole normal","ripeti normale"]
                             }
                         }
                     ]
@@ -559,12 +606,14 @@
                     "values": [
                         {
                             "name": {
-                                "value": "random"
+                                "value": "random",
+                                "synonyms": ["aleatorio","Aléatoire","zufällig","casuale"]
                             }
                         },
                         {
                             "name": {
-                                "value": "shuffle"
+                                "value": "shuffle",
+                                "synonyms": ["barajar","mélanger","Mischen","rimescolare"]
                             }
                         }
                     ]
