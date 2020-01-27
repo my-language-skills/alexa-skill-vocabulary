@@ -1,8 +1,19 @@
 # alexa-skill-vocabulary
 
-Vocabulary skill for amazon alexa.
-Provides vocabulary words with explanations in 5 languages.
-Must select a native language and a learning language before the learning process starts.
-Default native language is set to the alexa speaking language.
-The user can communicate with the skill in both native and learning language in every request except the 
-specific scenario of changing native or learning language, the request must be given in the native language.
+## Description:
+- Amazon Alexa skill for learning Vocabulary.
+- Vocabulary is provided in 5 languages. (English/Spanish/German/French/Italian).
+- Still in development stage.
+
+## Usage
+- Skill is used by setting up a Native and a Learning Language.
+- Native language has default value of alexa speaking language.
+- A request can be made to change either of them in any stage of the application.
+- When both languages are setup, the user can access a list of categories and subcategories of vocabulary words with examples.
+- Random option is provided throghout the application.
+
+
+## Special Request
+All requests can be given in both native or learning language except when:
+- It's a request for changing any of both languages (**MUST** be given in Native Language)
+- No learning language is selected (**MUST** be defined)
