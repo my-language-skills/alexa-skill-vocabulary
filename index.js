@@ -1,12 +1,17 @@
+/* Core Libraries for Skill */
 const Alexa = require('ask-sdk-core');
 const i18n = require('i18next');
 const sprintf = require('i18next-sprintf-postprocessor');
-const volume_levels = ['silent','x-soft','soft','medium','loud','x-loud'];
-const rate_levels = ['40%','50%','60%','75%','90%','100%','120%','150%','200%'];
+
+/* Custom Consts */
+const volume_levels = ['silent','x-soft','soft','medium','loud','x-loud']; //used to adjuste the sound volume 
+const rate_levels = ['40%','50%','60%','75%','90%','100%','120%','150%','200%']; // used to adjust the speech speed
 const content = require('./content');
 const content_language_strings = require('./language_strings').CONTENT;
 const editor_translations = require('./editor_options').CONTENT;
 const content_categories_info =  content.CONTENT.CATEGORIES_INFO;
+
+const skill_files = require('./requirer');
 /**
  * Setup for const value for content files..
  * 
@@ -75,6 +80,98 @@ const languageString = {
 
 
 // INTENTS
+
+/**Temp test intent to handle all requests for changing categories and subcategories */
+const UserSelectionIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UserSelectionIntent';
+    },
+    handle(handlerInput)
+    {   
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+
+        const query_response = slots['query'].value;
+        out = "user selection:"+query_response;
+        return handlerInput.responseBuilder
+        .withShouldEndSession(false)
+        .speak(out)
+        .getResponse();
+    }
+}
+
+const UserCategorySelectionIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UserCategorySelectionIntent';
+    },
+    handle(handlerInput)
+    {   
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+
+        //the value of query_response should be a category name
+        const query_response = slots['query'].value;
+        //function call to break category in an array
+        //handle all cases, split into spaces full string. 
+        //function to retrieve all category names.
+        //cases given category name in learning or native language.
+        out = "user category:"+query_response+testResults();
+        return handlerInput.responseBuilder
+        .withShouldEndSession(false)
+        .speak(out)
+        .getResponse();
+    }
+}
+function testResults()
+{
+    var retval='Return:';
+     var keys = skill_files.content().CATEGORIES_INFO;
+     retval+=typeof(keys);
+    /*return keys.length+','; */
+    for (var i=0;i<keys.length;i++)
+        retval += i+','+keys[i].english_title+'.';
+    return retval;
+    /* const category_names = skill_files.content != undefined ? Object.keys(skill_files.content) : undefined;
+    
+    if (category_names == undefined)
+    {
+        return 'undefined';
+    }
+    else
+    {
+        for (var i=0;i<category_names.length ;i++)
+        {
+            retval +=category_names[i]+',';
+        }
+        return retval+","+category_names;
+    } */
+}
+const UserSubcategorySelectionIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UserSubcategorySelectionIntent';
+    },
+    handle(handlerInput)
+    {   
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+
+        const query_response = slots['query'].value;
+        out = "user subcategory:"+query_response;
+        return handlerInput.responseBuilder
+        .withShouldEndSession(false)
+        .speak(out)
+        .getResponse();
+    }
+}
 const FallbackHandler = {
 
     // 2018-May-01: AMAZON.FallackIntent is only currently available in en-US locale.
@@ -385,6 +482,15 @@ const LaunchRequest = {
     },
     handle(handlerInput)
     {
+        /* var keys= Object.keys(test_re);
+        var out ='t';
+        for (var i=0;i<keys.length ;i++)
+            out+= i+','+keys[i]+'.'; */
+        /* var keys = Object.keys(handlerInput)
+        return handlerInput.responseBuilder    
+            .withShouldEndSession(false)
+            .speak(out) //normal call.
+            .getResponse(); */
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let output = requestAttributes.t("WELCOME",requestAttributes.t("SKILL_NAME"),requestAttributes.t("INITIAL_LANGUAGE"))+retrieve_Strings("help",requestAttributes.t("INITIAL_LANGUAGE"),"launch");
@@ -1369,9 +1475,12 @@ exports.handler = skillBuilder
     HelpIntent,
     CancelAndStopIntentHandler,
     FallbackHandler,
-    ShowCategories,
+    UserSelectionIntent,
+    UserCategorySelectionIntent,
+    UserSubcategorySelectionIntent,
+    //ShowCategories,
     RepeatMessageIntent,
-    SelectCategoryIntent,
+    //SelectCategoryIntent,
     DetailsIntent,
     IndexIntent,
     LanguageSelectionIntent,
@@ -1381,8 +1490,57 @@ exports.handler = skillBuilder
   .lambda();
 
 
-// USER DEFINED FUNCTIONS
 
+// USER DEFINED FUNCTIONS
+function testingFunc(handlerInput)
+{
+    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    var output="";
+    console.log("test");
+    const directoryPath = path.join(__dirname, 'Documents');
+    fs.readdir('./',function(err,files){
+
+        if (err) {
+            Object.assign(sessionAttributes,
+            {
+                file_error: err,
+            });
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+            return ;
+        } 
+        //listing all files using forEach
+        Object.assign(sessionAttributes,
+        {
+           files: files, 
+           found: 'sdfsdfs',
+        });            
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        files.forEach(function (file) {
+            // Do whatever you want to do with the file
+            test_global="file";
+        });
+    });
+    sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    return output+'nop?'+sessionAttributes.found+sessionAttributes.file_error+sessionAttributes.files;
+}
+function handleContentFiles()
+{
+    var output="";
+    /* var array= Object.values(path);
+    output = 'size is:'+array.length+", is type of"+typeof(array); */
+    /* Object.values(path).forEach(function(value)
+    {
+       output=value;
+    }); */
+    output = Object.values(path);
+    output = Object.values(output);
+    /* array.forEach(function(value)
+    {
+        output+=value+",";
+    }); */
+    return 'testing'+typeof(output);
+}
 
 /**
  * Given the information it sets the next example for the subcategory selected
