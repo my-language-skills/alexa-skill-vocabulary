@@ -105,17 +105,39 @@ const UserSelectionIntent = {
             //case when random triggered or user said random category
             if (sessionAttributes.category == undefined || (option != undefined  && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"category").toUpperCase()))
             {//randomizing categories
-                const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
-                category = category_list[Math.floor(Math.random()*category_list.length)];
-                output+= "category set to "+category;
+                const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
+                if (category_list != undefined)
+                {
+                    category = category_list[Math.floor(Math.random()*category_list.length)];
+                    output+= "category set to "+category;
+                }
+                else
+                {
+                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                }
             }
             else if (sessionAttributes.category != undefined || (option != undefined && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"subcategory").toUpperCase() && sessionAttributes.category != undefined))
             {//randomizing subcategories
-                const category_section = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
-                subcategory = category_section[Math.floor(Math.random()*category_section.length)];
-                output += "subcategory set to" + subcategory;
+                const category_section = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"native");
+                if (category_section != undefined)
+                {
+                    subcategory = category_section[Math.floor(Math.random()*category_section.length)];
+                    output += "subcategory set to" + subcategory;
+                }
+                else
+                {
+                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                }
+
             }
         }
+        
+        Object.assign(sessionAttributes,
+            {
+               category: category,
+               subcategory: subcategory
+            });
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
         .withShouldEndSession(false)
         .speak(output)
@@ -123,6 +145,10 @@ const UserSelectionIntent = {
     }
 }
 
+/**
+ * Custom Intent to handle the user request to select a new category
+ * Onlt triggered when given the command to set a category
+ */
 const UserCategorySelectionIntent = {
     canHandle(handlerInput)
     {
@@ -131,45 +157,93 @@ const UserCategorySelectionIntent = {
     },
     handle(handlerInput)
     {   
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
 
         //the value of query_response should be a category name
         const query_response = slots['query'].value;
+        let category = sessionAttributes.category;
+        let output = "";
         
-        var out = "";
-        const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(),"all");//getInfo2(requestAttributes,sessionAttributes,undefined,undefined,0));
-        const position = infoFound(query_response,category_list);
-        if (position!="false")
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
         {
-            out+= 'category selected:'+category_list[position];
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
         }
         else
-            out+= 'category not found, repeat again please';
+        {//learning language is configured, safe to proceed
+            //getting all categories names in native and learning language
+            const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"all");
+            if (category_list != undefined)
+            {
+                const position = infoFound(query_response,category_list);
+                if (position != undefined)
+                {//category requested is found. update values
+                    category = category_list[position]
+                    //message for new category selection
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category;
+                    //message for subcategory list available
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    //get subcategory list.
+                    const subcategory_list = createReturnList('subcategory',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    output += 
+                    category = category_list[position];
+                }
+                else
+                {//category name given was not valid/not found, assume given in different language
+                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+                }
+            }
+            else
+            {//return message for content error
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+            }
+        }
+        
+        
         
         Object.assign(sessionAttributes,
         {
-           category:query_response, 
-           test: 'test'
+           category: category
         });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         return handlerInput.responseBuilder 
         .withShouldEndSession(false)
-        .speak(""+out+"category changed?:"+sessionAttributes.category)
+        .speak(output)
         .getResponse();
     }
 }
-function retrieveFromJson(category = undefined,subcategory = undefined)
+
+/**
+ * @description Returns a specific section of the content file
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} category Name of category in JSON format
+ * @param {String} subcategory Name of subcategory in JSON fromat 
+ * 
+ * @return Object of specified section of content file
+ */
+function retrieveFromJson(sessionAttributes,category = undefined,subcategory = undefined)
 {
-    if (category == undefined)
+    if (category == undefined && subcategory == undefined)
     {//return the categories info section for all categories
         //categories info is static sectino in all json vocabulary files created
         return skill_files.content().CATEGORIES_INFO;
     }
     else if(category!= undefined && subcategory == undefined)
     {//category given, must retrieve the category section.
+        //must transform the category name into english (json static field values)
+        //get the values of all categories info. to transform the name
+        const cat_info_keys = Object.values(skill_files.content().CATEGORIES_INFO);
+        for (var j=0; j<cat_info_keys.length; j++)
+        {
+            if (removeSSML(languageProvider(sessionAttributes.learning_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase() || languageProvider(sessionAttributes.native_language,cat_info_keys[j],"category").toUpperCase() == category.toUpperCase()) 
+            {//category name found in learning or native language
+                category = removeSSML(languageProvider("english",cat_info_keys[j],"category"));
+            }
+        }
         const keys = Object.keys(skill_files.content());
         //to skip the categories_info section 
         for (var i=1; i<keys.length; i++)
@@ -177,7 +251,7 @@ function retrieveFromJson(category = undefined,subcategory = undefined)
             {//found here
                 return Object.values(skill_files.content())[i];
             }
-        return 'false';
+        return undefined;
     }
     /* else if (category != undefined && subcategory != undefined)
     {//category given and subcategory. to retrieve a part of the category section
@@ -190,11 +264,20 @@ function retrieveFromJson(category = undefined,subcategory = undefined)
             }
         return 'false';
     } */
-    else
-        return 'false';
+    return undefined;
 }
 
-
+/**
+ * @description Checks if the given keyword (category or subcategory) exists for the selected languages
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} query_response Name of category or subcategory
+ * @param {Array} category_list List of category/subcategory names to check
+ * 
+ * @return Position in list or undefined if not found
+ */
 function infoFound(query_response, category_list)
 {
     for (var i=0; i<category_list.length/2; i++)
@@ -203,20 +286,34 @@ function infoFound(query_response, category_list)
             || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase())
             return category_list[i].toUpperCase() == query_response.toUpperCase() ? i : category_list.length/2+i;
     }
-    return 'false';
+    return undefined;
 }
+
+/**
+ * @description Takes the custom parameters and creates and returns a clean list (no ssml tags) of content information
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} option The type of section to return from the language provider options
+ * @param {Object} sessionAttributes Object that contains the session attributes of the user
+ * @param {Object} section_info Json Section retrieved from the content file
+ * @param {String} return_option Option for the return values
+ * 
+ * @return the list of categories/subcategories or undefined if content error
+ */
 function createReturnList(option,sessionAttributes,section_info,return_option)
 {
     //2 languages to check in the categories info list.
     const learning_language = sessionAttributes.learning_language;
     const native_language = sessionAttributes.native_language;
 
-    if (section_info != 'false')
+    if (section_info != undefined)
     {//successfully retrieved the section info
         var learning_list = [section_info.length];
         var native_list = [section_info.length];
         //get the categories info section from json.
-        if (learning_language != undefined && native_language != undefined)
+        if (learning_language != undefined)
         {   
             for (var i=0; i < section_info.length; i++)
             {
@@ -239,9 +336,19 @@ function createReturnList(option,sessionAttributes,section_info,return_option)
                 return learning_list;
         }
     }
-    return 'false';
+    return undefined;
 }
 
+/**
+ * @description Takes parameter a string and removes any ssml tags included before. Returns clean text.
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} ssmltext Text with ssml tags
+ * 
+ * @return text with tags stripped
+ */
 function removeSSML(ssmltext)
 {
     //index variable to remove the ssml tags from the values
@@ -273,14 +380,22 @@ const UserSubcategorySelectionIntent = {
         //check for category to be defined first
         if (sessionAttributes.category)
         {
-            const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
-            const position = infoFound(query_response,subcategory_list);
-            if (position!="false")
+            const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
+            if (subcategory_list != undefined)
             {
-                out+= 'subcategory selected:'+subcategory_list[position];
+               const position = infoFound(query_response,subcategory_list);
+                if (position!= undefined)
+                {
+                    out+= 'subcategory selected:'+subcategory_list[position];
+                }
+                else
+                    out+= 'subcategory not found, repeat again please'; 
             }
             else
-                out+= 'subcategory not found, repeat again please';
+            {
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+            }
+            
         }
         else
             out+='category not configured';
@@ -292,6 +407,11 @@ const UserSubcategorySelectionIntent = {
         .getResponse();
     }
 }
+
+/**
+ * Custom Intent to handle the request to show the list of categories/subcategories.
+ * User must trigger the option slot to activate this intention.
+ */
 const ShowCategoriesIntent ={
     canHandle(handlerInput)
     {
@@ -300,7 +420,6 @@ const ShowCategoriesIntent ={
     },
     handle(handlerInput)
     { 
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
         const option = slots['option'].value;
@@ -317,8 +436,8 @@ const ShowCategoriesIntent ={
                 if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"categories").toUpperCase() 
                     || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase())
                 {//user requested to display all categories available
-                    section =  createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
-                    if (section != 'false')// check if section list retrieved without errors
+                    section =  createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
+                    if (section != undefined)// check if section list retrieved without errors
                         output+= retrieve_Strings("general",sessionAttributes.native_language,"category_list")+ ". "+section;
                     else 
                         output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
@@ -333,8 +452,8 @@ const ShowCategoriesIntent ={
                     }
                     else
                     {//category is set before
-                        section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
-                        if (section != 'false') // check if section list retrieved without errors
+                        section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"native");
+                        if (section != undefined) // check if section list retrieved without errors
                             output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+sessionAttributes.category+ ". "+section;
                         else 
                             output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
@@ -352,13 +471,12 @@ const ShowCategoriesIntent ={
         Object.assign(sessionAttributes,
         {
             lastmsg: output,
-            helpmesg: "ShowCategories",
+            helpmsg: "ShowCategories",
             break: 0,
-            //rate: "100%",
-            volume: "medium",
             voice: retrieve_Strings("voices",sessionAttributes.native_language),
         });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        //setting appropriate voice for the return message.
         output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder 
             .withShouldEndSession(false)
