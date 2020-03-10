@@ -202,7 +202,7 @@ const UserCategorySelectionIntent = {
                 output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
             }
         }
-                
+        //update values of session attributes      
         Object.assign(sessionAttributes,
         {
             lastmsg: output,
@@ -213,6 +213,9 @@ const UserCategorySelectionIntent = {
             break: 0,
         });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder 
         .withShouldEndSession(false)
         .speak(output)
@@ -378,38 +381,69 @@ const UserSubcategorySelectionIntent = {
     },
     handle(handlerInput)
     {   
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
-        var out="";
+        
+        //value of query_response must be a subcategory name
         const query_response = slots['query'].value;
-        //check for category to be defined first
-        if (sessionAttributes.category)
+        let subcategory = sessionAttributes.subcategory;
+        let output = "";
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
         {
-            const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
-            if (subcategory_list != undefined)
-            {
-               const position = infoFound(query_response,subcategory_list);
-                if (position!= undefined)
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language is configured, safe to proceed
+            //check for category to be defined first
+            if (sessionAttributes.category)
+            {//category is set
+                const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
+                if (subcategory_list != undefined)
                 {
-                    out+= 'subcategory selected:'+subcategory_list[position];
+                    const position = infoFound(query_response,subcategory_list);
+                    if (position!= undefined)
+                    {//subcategory requested is found. 
+                        subcategory = subcategory_list[position];
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
+                    }
+                    else
+                    {//category name given was not valid/not found, assume given in different language
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                        subcategory = undefined;
+                    }
                 }
                 else
-                    out+= 'subcategory not found, repeat again please'; 
+                {
+                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    subcategory = undefined;
+                }
+                
             }
             else
             {
-                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
+                subcategory = undefined;
             }
-            
         }
-        else
-            out+='category not configured';
         
+        //update values of session attributes      
+        Object.assign(sessionAttributes,
+        {
+            lastmsg: output,
+            helpmsg: subcategory != undefined ? "UserSelectionSubcategory" : "ShowCategories",
+            subcategory: subcategory,
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder 
         .withShouldEndSession(false)
-        .speak(""+out)
+        .speak(output)
         .getResponse();
     }
 }
@@ -460,7 +494,14 @@ const ShowCategoriesIntent ={
                     {//category is set before
                         section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"native");
                         if (section != undefined) // check if section list retrieved without errors
-                            output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+sessionAttributes.category+ ". "+section;
+                        {
+                            output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+sessionAttributes.category+ ". ";
+                            for (var i=0;i<section.length;i++)
+                            {
+                                output += i==0 ? " " : ", ";
+                                output += section[i].replace(","," and")+" ";
+                            }
+                        }
                         else 
                             output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
                     }
@@ -2519,6 +2560,8 @@ function retrieve_Strings(string_category,language,type)
                             return retriever[i].content_error;
                         case "name_not_found":
                             return retriever[i].name_not_found;
+                        case "not_category":
+                            return retriever[i].not_category;
                     }
                 }
             }
