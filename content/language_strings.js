@@ -226,6 +226,7 @@ module.exports = {
                 learning_warn: "Learning language is already set to ",
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in English but received it in ",
+                content_error: "Something wrong with the skill's content information. Please try again. ",
             },
             {
                 language:"french",
@@ -241,6 +242,7 @@ module.exports = {
                 learning_warn: "Learning language is already set to ",
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in French but received it in ",
+                content_error: "Something wrong with the skill's content information. Please try again. ",
             },
             {
                 language:"german",
@@ -256,6 +258,7 @@ module.exports = {
                 learning_warn: "Learning language is already set to ",
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in German but received it in ",
+                content_error: "Something wrong with the skill's content information. Please try again. ",
             },
             {
                 language:"italian",
@@ -271,6 +274,7 @@ module.exports = {
                 learning_warn: "Learning language is already set to ",
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in Italian but received it in ",
+                content_error: "Something wrong with the skill's content information. Please try again. ",
             },
             {
                 language:"spanish",
@@ -286,6 +290,7 @@ module.exports = {
                 learning_warn: "El idiom de estudio está configurado a ",
                 reset: "Las categorias y subcategorías han sido reiniciadas. ",
                 given_request: "La petición deberá haber sido realizada en Español, pero ha sido recibida en ",
+                content_error: "Something wrong with the skill's content information. Please try again. ",
             }
         ],
         LANGUAGE_STRINGS:

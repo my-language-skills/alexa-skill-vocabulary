@@ -211,30 +211,33 @@ function createReturnList(option,sessionAttributes,section_info,return_option)
     const learning_language = sessionAttributes.learning_language;
     const native_language = sessionAttributes.native_language;
 
-    var learning_list = [section_info.length];
-    var native_list = [section_info.length];
-    //get the categories info section from json.
-    if (learning_language != undefined && native_language != undefined)
-    {   
-        for (var i=0; i < section_info.length; i++)
-        {
-            const learning_title = languageProvider(learning_language,section_info[i],option);
-            const native_title = languageProvider(native_language,section_info[i],option);
-            if (native_title)//adding to native array
+    if (section_info != 'false')
+    {//successfully retrieved the section info
+        var learning_list = [section_info.length];
+        var native_list = [section_info.length];
+        //get the categories info section from json.
+        if (learning_language != undefined && native_language != undefined)
+        {   
+            for (var i=0; i < section_info.length; i++)
             {
-                native_list[i]=removeSSML(native_title);
+                const learning_title = languageProvider(learning_language,section_info[i],option);
+                const native_title = languageProvider(native_language,section_info[i],option);
+                if (native_title)//adding to native array
+                {
+                    native_list[i]=removeSSML(native_title);
+                }
+                if (learning_title)//adding to native array
+                {
+                    learning_list[i]=removeSSML(learning_title);
+                }    
             }
-            if (learning_title)//adding to native array
-            {
-                learning_list[i]=removeSSML(learning_title);
-            }    
+            if (return_option == "all")
+                return native_list.concat(learning_list);
+            else if (return_option == "native")
+                return native_list;
+            else if (return_option == "learning")
+                return learning_list;
         }
-        if (return_option == "all")
-            return native_list.concat(learning_list);
-        else if (return_option == "native")
-            return native_list;
-        else if (return_option == "learning")
-            return learning_list;
     }
     return 'false';
 }
@@ -289,7 +292,7 @@ const UserSubcategorySelectionIntent = {
         .getResponse();
     }
 }
-const showCategoriesIntent ={
+const ShowCategoriesIntent ={
     canHandle(handlerInput)
     {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -301,32 +304,66 @@ const showCategoriesIntent ={
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
         const option = slots['option'].value;
-        var output;
-        if (option)
-        {//option is given. Always true
-            let section;
-            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"categories").toUpperCase() 
-                || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase())
-            {//category keyword given correctly
-                section =  createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
-                output = "showing categories:";
+        let output = "";
+        if (sessionAttributes.learning_language == "none")
+        {//learning language not configured
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language is set 
+            if (option)
+            {//option is given. Always true
+                let section;
+                if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"categories").toUpperCase() 
+                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase())
+                {//user requested to display all categories available
+                    section =  createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
+                    if (section != 'false')// check if section list retrieved without errors
+                        output+= retrieve_Strings("general",sessionAttributes.native_language,"category_list")+ ". "+section;
+                    else 
+                        output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                }
+                else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategories").toUpperCase()
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategories").toUpperCase())
+                {//user requested to display all subcategories available
+                    //category must be selected first for this
+                    if (sessionAttributes.category == undefined)
+                    {//no category is selected
+                        output+= retrieve_Strings("warnings",sessionAttributes.native_language,"category")+retrieve_Strings("general",sessionAttributes.native_language,"suggested");
+                    }
+                    else
+                    {//category is set before
+                        section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
+                        if (section != 'false') // check if section list retrieved without errors
+                            output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+sessionAttributes.category+ ". "+section;
+                        else 
+                            output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    }
+                }
+                else
+                {//request is not matched for showing categories or subcategories in native or learning language
+                 //=> request given in different language
+                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+                }
             }
-            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategories").toUpperCase()
-                || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategories").toUpperCase())
-            {
-                section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
-                output = "showing subcategories";
-            }
-            if (section != undefined)
-            {
-                output+=section;
-            }
-            return handlerInput.responseBuilder 
-            .withShouldEndSession(false)
-            .speak(output)
-            .getResponse();
         }
 
+        //updating the session Attributes
+        Object.assign(sessionAttributes,
+        {
+            lastmsg: output,
+            helpmesg: "ShowCategories",
+            break: 0,
+            //rate: "100%",
+            volume: "medium",
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        output = switchVoice(output,sessionAttributes);
+        return handlerInput.responseBuilder 
+            .withShouldEndSession(false)
+            .speak(output)
+            .getResponse(); 
     }
 }
 const FallbackHandler = {
@@ -1635,7 +1672,7 @@ exports.handler = skillBuilder
     UserSelectionIntent,
     UserCategorySelectionIntent,
     UserSubcategorySelectionIntent,
-    showCategoriesIntent,
+    ShowCategoriesIntent,
     //ShowCategories,
     RepeatMessageIntent,
     //SelectCategoryIntent,
@@ -2352,6 +2389,8 @@ function retrieve_Strings(string_category,language,type)
                             return retriever[i].reset;
                         case "given_request": 
                             return retriever[i].given_request;
+                        case "content_error":
+                            return retriever[i].content_error;
                     }
                 }
             }
