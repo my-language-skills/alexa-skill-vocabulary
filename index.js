@@ -179,32 +179,38 @@ const UserCategorySelectionIntent = {
                 const position = infoFound(query_response,category_list);
                 if (position != undefined)
                 {//category requested is found. update values
-                    category = category_list[position]
+                    category = category_list[position];
                     //message for new category selection
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category;
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
                     //message for subcategory list available
                     output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
                     //get subcategory list.
-                    const subcategory_list = createReturnList('subcategory',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    output += 
-                    category = category_list[position];
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    for (var i=0; i< subcategory_list.length; i++)
+                    {
+                        output += i==0 ? " " : ", ";
+                        output +=subcategory_list[i].replace(","," and")+" ";
+                    }
                 }
                 else
                 {//category name given was not valid/not found, assume given in different language
-                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+                    output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
                 }
             }
             else
             {//return message for content error
-                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
             }
         }
-        
-        
-        
+                
         Object.assign(sessionAttributes,
         {
-           category: category
+            lastmsg: output,
+            helpmsg: "UserSelectionCategory",
+            category: category,
+            subcategory: undefined,
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
         });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder 
@@ -572,13 +578,13 @@ const HelpIntent = {
             {
                 helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"launch");
             }
-            else if (sessionAttributes.helpmsg == "ShowCategories")
+            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
             {
                 helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
             }
-            else if (sessionAttributes.helpmsg == "SelectCategories")
+            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
             {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories");
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories" );
             }
             else if (sessionAttributes.helpmsg == "ExampleIntent")
             {
@@ -606,11 +612,11 @@ const HelpIntent = {
             {
                 helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"welcome");
             }
-            else if (sessionAttributes.helpmsg == "ShowCategories")
+            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
             {
                 helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
             }
-            else if (sessionAttributes.helpmsg == "SelectCategories")
+            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
             {
                 helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"select_categories");
             }
@@ -623,8 +629,10 @@ const HelpIntent = {
             else if (sessionAttributes.helpmsg == "IndexIntent")
                 if (sessionAttributes.learning_language == "none")
                     helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"welcome");
-                else
+                else if (sessionAttributes.subcategory != undefined)
                     helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"index");
+                else
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
             else if (sessionAttributes.helpmsg == "LanguageSelection")
             {
                 if (sessionAttributes.reset == false)
@@ -2509,6 +2517,8 @@ function retrieve_Strings(string_category,language,type)
                             return retriever[i].given_request;
                         case "content_error":
                             return retriever[i].content_error;
+                        case "name_not_found":
+                            return retriever[i].name_not_found;
                     }
                 }
             }

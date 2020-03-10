@@ -139,7 +139,7 @@ module.exports = {
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
-                reset: "Learning language has changed, select category to continue. "
+                reset: "Learning language has changed, select category to continue. ",
             },
             {
                 language: "spanish",
@@ -149,7 +149,7 @@ module.exports = {
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
                 resume: "Dí actual categoría, subcatgoría o ejemplo para Say current and category, subcategory or example to relocate yourself. ",
-                reset: "El idioma de aprenizaje ha cambiado, selecciona una categoría para continuar. "
+                reset: "El idioma de aprenizaje ha cambiado, selecciona una categoría para continuar. ",
             }
         ],
         OPTION_STRINGS:
@@ -227,6 +227,7 @@ module.exports = {
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in English but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
+                name_not_found: " doesn't exists in my available list .",
             },
             {
                 language:"french",
@@ -243,6 +244,7 @@ module.exports = {
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in French but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
+                name_not_found: " doesn't exists in my available list .",
             },
             {
                 language:"german",
@@ -259,6 +261,7 @@ module.exports = {
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in German but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
+                name_not_found: " doesn't exists in my available list .",
             },
             {
                 language:"italian",
@@ -275,6 +278,7 @@ module.exports = {
                 reset: "Categories and subcategories are reset. ",
                 given_request: "Request must be given in Italian but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
+                name_not_found: " doesn't exists in my available list .",
             },
             {
                 language:"spanish",
@@ -291,6 +295,7 @@ module.exports = {
                 reset: "Las categorias y subcategorías han sido reiniciadas. ",
                 given_request: "La petición deberá haber sido realizada en Español, pero ha sido recibida en ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
+                name_not_found: " doesn't exists in my available list .",
             }
         ],
         LANGUAGE_STRINGS:
