@@ -228,7 +228,7 @@ module.exports = {
                 given_request: "Request must be given in English but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
-                not_category: "You haven't selected a category first .",
+                not_category: "You have to selected a category first .",
             },
             {
                 language:"french",
@@ -246,7 +246,7 @@ module.exports = {
                 given_request: "Request must be given in French but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
-                not_category: "You haven't selected a category first .",
+                not_category: "You have to selected a category first .",
             },
             {
                 language:"german",
@@ -264,7 +264,7 @@ module.exports = {
                 given_request: "Request must be given in German but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
-                not_category: "You haven't selected a category first .",
+                not_category: "You have to selected a category first .",
             },
             {
                 language:"italian",
@@ -282,7 +282,7 @@ module.exports = {
                 given_request: "Request must be given in Italian but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
-                not_category: "You haven't selected a category first .",
+                not_category: "You have to selected a category first .",
             },
             {
                 language:"spanish",
@@ -300,7 +300,7 @@ module.exports = {
                 given_request: "La petición deberá haber sido realizada en Español, pero ha sido recibida en ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
-                not_category: "You haven't selected a category first .",
+                not_category: "You have to selected a category first .",
             }
         ],
         LANGUAGE_STRINGS:

@@ -81,7 +81,9 @@ const languageString = {
 
 // INTENTS
 
-/**Temp test intent to handle all requests for changing categories and subcategories */
+/**
+ * Custom intent to select random category/subcategory
+ */
 const UserSelectionIntent = {
     canHandle(handlerInput)
     {
@@ -93,51 +95,82 @@ const UserSelectionIntent = {
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
-
+        /* Const values for slots*/
         const option = slots['option_selection'].value;
-        const random = slots['random'].value;
+
         let category = sessionAttributes.category;
         let subcategory = sessionAttributes.subcategory;
         var output="";
-//TODO: check for languages and messages
-        if (random != undefined)
-        {//random option enabled.
-            //case when random triggered or user said random category
-            if (sessionAttributes.category == undefined || (option != undefined  && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"category").toUpperCase()))
-            {//randomizing categories
-                const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
-                if (category_list != undefined)
+        
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
+        {
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language set, safe to proceed
+            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"category").toUpperCase() 
+                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"category").toUpperCase())
+            {//option is given in native or learning language for keyword category
+                const section = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
+                if (section != undefined)
                 {
-                    category = category_list[Math.floor(Math.random()*category_list.length)];
-                    output+= "category set to "+category;
+                    category = section[Math.floor(Math.random()*section.length)];
+                    //message for new category selection
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
+                    //message for subcategory list available
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    //get subcategory list.
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    if (subcategory_list != undefined)
+                    {
+                        for (var i=0; i< subcategory_list.length; i++)
+                        {
+                            output += i==0 ? " " : ", ";
+                            output +=subcategory_list[i].replace(","," and")+" ";
+                        }
+                    }
+                    else       
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
                 }
-                else
-                {
-                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-                }
+                else 
+                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
             }
-            else if (sessionAttributes.category != undefined || (option != undefined && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"subcategory").toUpperCase() && sessionAttributes.category != undefined))
-            {//randomizing subcategories
-                const category_section = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"native");
-                if (category_section != undefined)
-                {
-                    subcategory = category_section[Math.floor(Math.random()*category_section.length)];
-                    output += "subcategory set to" + subcategory;
+            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategory").toUpperCase()
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategory").toUpperCase())
+            {//option is given in native or learning language for keyword subcategory
+                if (category != undefined)
+                {//category is set. moving to randomizing subcategories
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    if (subcategory_list!= undefined)
+                    {
+                        subcategory = subcategory_list[Math.floor(Math.random()*subcategory_list.length)];
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
+                    }
                 }
                 else
-                {
-                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-                }
-
+                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
+            }
+            else
+            {//return message for wrong keyword
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
             }
         }
-        
+        //update values of session attributes
         Object.assign(sessionAttributes,
-            {
-               category: category,
-               subcategory: subcategory
-            });
-            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        {
+            lastmsg: output,
+            helpmsg: "UserSelection",
+            category: category,
+            subcategory: subcategory,
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder
         .withShouldEndSession(false)
         .speak(output)
@@ -186,11 +219,16 @@ const UserCategorySelectionIntent = {
                     output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
                     //get subcategory list.
                     const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    for (var i=0; i< subcategory_list.length; i++)
+                    if (subcategory_list != undefined)
                     {
-                        output += i==0 ? " " : ", ";
-                        output +=subcategory_list[i].replace(","," and")+" ";
+                        for (var i=0; i< subcategory_list.length; i++)
+                        {
+                            output += i==0 ? " " : ", ";
+                            output +=subcategory_list[i].replace(","," and")+" ";
+                        }
                     }
+                    else
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
                 }
                 else
                 {//category name given was not valid/not found, assume given in different language
@@ -221,156 +259,6 @@ const UserCategorySelectionIntent = {
         .speak(output)
         .getResponse();
     }
-}
-
-/**
- * @description Returns a specific section of the content file
- * 
- * @author CharalamposTheodorou
- * @since 1.1
- * 
- * @param {String} category Name of category in JSON format
- * @param {String} subcategory Name of subcategory in JSON fromat 
- * 
- * @return Object of specified section of content file
- */
-function retrieveFromJson(sessionAttributes,category = undefined,subcategory = undefined)
-{
-    if (category == undefined && subcategory == undefined)
-    {//return the categories info section for all categories
-        //categories info is static sectino in all json vocabulary files created
-        return skill_files.content().CATEGORIES_INFO;
-    }
-    else if(category!= undefined && subcategory == undefined)
-    {//category given, must retrieve the category section.
-        //must transform the category name into english (json static field values)
-        //get the values of all categories info. to transform the name
-        const cat_info_keys = Object.values(skill_files.content().CATEGORIES_INFO);
-        for (var j=0; j<cat_info_keys.length; j++)
-        {
-            if (removeSSML(languageProvider(sessionAttributes.learning_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase() || languageProvider(sessionAttributes.native_language,cat_info_keys[j],"category").toUpperCase() == category.toUpperCase()) 
-            {//category name found in learning or native language
-                category = removeSSML(languageProvider("english",cat_info_keys[j],"category"));
-            }
-        }
-        const keys = Object.keys(skill_files.content());
-        //to skip the categories_info section 
-        for (var i=1; i<keys.length; i++)
-            if (keys[i].toUpperCase() == category.toUpperCase().split(" ").join("_"))
-            {//found here
-                return Object.values(skill_files.content())[i];
-            }
-        return undefined;
-    }
-    /* else if (category != undefined && subcategory != undefined)
-    {//category given and subcategory. to retrieve a part of the category section
-        const keys = Object.keys(skill_files.content());
-        //to skip the categories_info section 
-        for (var i=1; i<keys.length; i++)
-            if (keys[i].toUpperCase() == category.toUpperCase().split(" ").join("_"))
-            {//found here
-                const  Object.values(skill_files.content())[i];
-            }
-        return 'false';
-    } */
-    return undefined;
-}
-
-/**
- * @description Checks if the given keyword (category or subcategory) exists for the selected languages
- * 
- * @author CharalamposTheodorou
- * @since 1.1
- * 
- * @param {String} query_response Name of category or subcategory
- * @param {Array} category_list List of category/subcategory names to check
- * 
- * @return Position in list or undefined if not found
- */
-function infoFound(query_response, category_list)
-{
-    for (var i=0; i<category_list.length/2; i++)
-    {
-        if (category_list[i].toUpperCase() == query_response.toUpperCase()
-            || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase())
-            return category_list[i].toUpperCase() == query_response.toUpperCase() ? i : category_list.length/2+i;
-    }
-    return undefined;
-}
-
-/**
- * @description Takes the custom parameters and creates and returns a clean list (no ssml tags) of content information
- * 
- * @author CharalamposTheodorou
- * @since 1.1
- * 
- * @param {String} option The type of section to return from the language provider options
- * @param {Object} sessionAttributes Object that contains the session attributes of the user
- * @param {Object} section_info Json Section retrieved from the content file
- * @param {String} return_option Option for the return values
- * 
- * @return the list of categories/subcategories or undefined if content error
- */
-function createReturnList(option,sessionAttributes,section_info,return_option)
-{
-    //2 languages to check in the categories info list.
-    const learning_language = sessionAttributes.learning_language;
-    const native_language = sessionAttributes.native_language;
-
-    if (section_info != undefined)
-    {//successfully retrieved the section info
-        var learning_list = [section_info.length];
-        var native_list = [section_info.length];
-        //get the categories info section from json.
-        if (learning_language != undefined)
-        {   
-            for (var i=0; i < section_info.length; i++)
-            {
-                const learning_title = languageProvider(learning_language,section_info[i],option);
-                const native_title = languageProvider(native_language,section_info[i],option);
-                if (native_title)//adding to native array
-                {
-                    native_list[i]=removeSSML(native_title);
-                }
-                if (learning_title)//adding to native array
-                {
-                    learning_list[i]=removeSSML(learning_title);
-                }    
-            }
-            if (return_option == "all")
-                return native_list.concat(learning_list);
-            else if (return_option == "native")
-                return native_list;
-            else if (return_option == "learning")
-                return learning_list;
-        }
-    }
-    return undefined;
-}
-
-/**
- * @description Takes parameter a string and removes any ssml tags included before. Returns clean text.
- * 
- * @author CharalamposTheodorou
- * @since 1.1
- * 
- * @param {String} ssmltext Text with ssml tags
- * 
- * @return text with tags stripped
- */
-function removeSSML(ssmltext)
-{
-    //index variable to remove the ssml tags from the values
-    var index = ssmltext.indexOf('<');
-    let tag;
-    while(index!=-1)
-    {
-        //to cleanse the text 
-        tag = ssmltext.substring(index,ssmltext.indexOf('>')+1); 
-        ssmltext = ssmltext.replace(tag,"");
-        index = ssmltext.indexOf('<');
-    }
-    return ssmltext;
 }
 
 const UserSubcategorySelectionIntent = {
@@ -1854,54 +1742,144 @@ exports.handler = skillBuilder
 
 
 // USER DEFINED FUNCTIONS
-function testingFunc(handlerInput)
-{
-    let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    var output="";
-    console.log("test");
-    const directoryPath = path.join(__dirname, 'Documents');
-    fs.readdir('./',function(err,files){
 
-        if (err) {
-            Object.assign(sessionAttributes,
-            {
-                file_error: err,
-            });
-            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-            return ;
-        } 
-        //listing all files using forEach
-        Object.assign(sessionAttributes,
+/**
+ * @description Returns a specific section of the content file
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} category Name of category in JSON format
+ * @param {String} subcategory Name of subcategory in JSON fromat 
+ * 
+ * @return Object of specified section of content file
+ */
+function retrieveFromJson(sessionAttributes,category = undefined,subcategory = undefined)
+{
+    if (category == undefined && subcategory == undefined)
+    {//return the categories info section for all categories
+        //categories info is static sectino in all json vocabulary files created
+        return skill_files.content().CATEGORIES_INFO;
+    }
+    else if(category!= undefined && subcategory == undefined)
+    {//category given, must retrieve the category section.
+        //must transform the category name into english (json static field values)
+        //get the values of all categories info. to transform the name
+        const cat_info_keys = Object.values(skill_files.content().CATEGORIES_INFO);
+        for (var j=0; j<cat_info_keys.length; j++)
         {
-           files: files, 
-           found: 'sdfsdfs',
-        });            
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-        files.forEach(function (file) {
-            // Do whatever you want to do with the file
-            test_global="file";
-        });
-    });
-    sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    return output+'nop?'+sessionAttributes.found+sessionAttributes.file_error+sessionAttributes.files;
+            if (removeSSML(languageProvider(sessionAttributes.learning_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase() || languageProvider(sessionAttributes.native_language,cat_info_keys[j],"category").toUpperCase() == category.toUpperCase()) 
+            {//category name found in learning or native language
+                category = removeSSML(languageProvider("english",cat_info_keys[j],"category"));
+            }
+        }
+        const keys = Object.keys(skill_files.content());
+        //to skip the categories_info section 
+        for (var i=1; i<keys.length; i++)
+            if (keys[i].toUpperCase() == category.toUpperCase().split(" ").join("_"))
+            {//found here
+                return Object.values(skill_files.content())[i];
+            }
+        return undefined;
+    }
+    return undefined;
 }
-function handleContentFiles()
+
+/**
+ * @description Checks if the given keyword (category or subcategory) exists for the selected languages
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} query_response Name of category or subcategory
+ * @param {Array} category_list List of category/subcategory names to check
+ * 
+ * @return Position in list or undefined if not found
+ */
+function infoFound(query_response, category_list)
 {
-    var output="";
-    /* var array= Object.values(path);
-    output = 'size is:'+array.length+", is type of"+typeof(array); */
-    /* Object.values(path).forEach(function(value)
+    for (var i=0; i<category_list.length/2; i++)
     {
-       output=value;
-    }); */
-    output = Object.values(path);
-    output = Object.values(output);
-    /* array.forEach(function(value)
+        if (category_list[i].toUpperCase() == query_response.toUpperCase()
+            || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase())
+            return category_list[i].toUpperCase() == query_response.toUpperCase() ? i : category_list.length/2+i;
+    }
+    return undefined;
+}
+
+/**
+ * @description Takes the custom parameters and creates and returns a clean list (no ssml tags) of content information
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} option The type of section to return from the language provider options
+ * @param {Object} sessionAttributes Object that contains the session attributes of the user
+ * @param {Object} section_info Json Section retrieved from the content file
+ * @param {String} return_option Option for the return values
+ * 
+ * @return the list of categories/subcategories or undefined if content error
+ */
+function createReturnList(option,sessionAttributes,section_info,return_option)
+{
+    //2 languages to check in the categories info list.
+    const learning_language = sessionAttributes.learning_language;
+    const native_language = sessionAttributes.native_language;
+
+    if (section_info != undefined)
+    {//successfully retrieved the section info
+        var learning_list = [section_info.length];
+        var native_list = [section_info.length];
+        //get the categories info section from json.
+        if (learning_language != undefined)
+        {   
+            for (var i=0; i < section_info.length; i++)
+            {
+                const learning_title = languageProvider(learning_language,section_info[i],option);
+                const native_title = languageProvider(native_language,section_info[i],option);
+                if (native_title)//adding to native array
+                {
+                    native_list[i]=removeSSML(native_title);
+                }
+                if (learning_title)//adding to native array
+                {
+                    learning_list[i]=removeSSML(learning_title);
+                }    
+            }
+            if (return_option == "all")
+                return native_list.concat(learning_list);
+            else if (return_option == "native")
+                return native_list;
+            else if (return_option == "learning")
+                return learning_list;
+        }
+    }
+    return undefined;
+}
+
+/**
+ * @description Takes parameter a string and removes any ssml tags included before. Returns clean text.
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.1
+ * 
+ * @param {String} ssmltext Text with ssml tags
+ * 
+ * @return text with tags stripped
+ */
+function removeSSML(ssmltext)
+{
+    //index variable to remove the ssml tags from the values
+    var index = ssmltext.indexOf('<');
+    let tag;
+    while(index!=-1)
     {
-        output+=value+",";
-    }); */
-    return 'testing'+typeof(output);
+        //to cleanse the text 
+        tag = ssmltext.substring(index,ssmltext.indexOf('>')+1); 
+        ssmltext = ssmltext.replace(tag,"");
+        index = ssmltext.indexOf('<');
+    }
+    return ssmltext;
 }
 
 /**

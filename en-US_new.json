@@ -41,9 +41,9 @@
                         }
                     ],
                     "samples" :[
-                        "{option_selection} {random}",
-                        "{random} {option_selection}",
-                        "{option_selection}"
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
+                        "open {option_selection}"
                     ]
                 },
                 {
