@@ -94,11 +94,31 @@ const UserSelectionIntent = {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
 
-        const query_response = slots['query'].value;
-        out = "user selection:"+query_response;
+        const option = slots['option_selection'].value;
+        const random = slots['random'].value;
+        let category = sessionAttributes.category;
+        let subcategory = sessionAttributes.subcategory;
+        var output="";
+//TODO: check for languages and messages
+        if (random != undefined)
+        {//random option enabled.
+            //case when random triggered or user said random category
+            if (sessionAttributes.category == undefined || (option != undefined  && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"category").toUpperCase()))
+            {//randomizing categories
+                const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
+                category = category_list[Math.floor(Math.random()*category_list.length)];
+                output+= "category set to "+category;
+            }
+            else if (sessionAttributes.category != undefined || (option != undefined && option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"subcategory").toUpperCase() && sessionAttributes.category != undefined))
+            {//randomizing subcategories
+                const category_section = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
+                subcategory = category_section[Math.floor(Math.random()*category_section.length)];
+                output += "subcategory set to" + subcategory;
+            }
+        }
         return handlerInput.responseBuilder
         .withShouldEndSession(false)
-        .speak(out)
+        .speak(output)
         .getResponse();
     }
 }
@@ -112,46 +132,128 @@ const UserCategorySelectionIntent = {
     handle(handlerInput)
     {   
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
 
         //the value of query_response should be a category name
         const query_response = slots['query'].value;
-        //function call to break category in an array
-        //handle all cases, split into spaces full string. 
-        //function to retrieve all category names.
-        //cases given category name in learning or native language.
-        out = "user category:"+query_response+testResults();
-        return handlerInput.responseBuilder
+        
+        var out = "";
+        const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(),"all");//getInfo2(requestAttributes,sessionAttributes,undefined,undefined,0));
+        const position = infoFound(query_response,category_list);
+        if (position!="false")
+        {
+            out+= 'category selected:'+category_list[position];
+        }
+        else
+            out+= 'category not found, repeat again please';
+        
+        Object.assign(sessionAttributes,
+        {
+           category:query_response, 
+           test: 'test'
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        return handlerInput.responseBuilder 
         .withShouldEndSession(false)
-        .speak(out)
+        .speak(""+out+"category changed?:"+sessionAttributes.category)
         .getResponse();
     }
 }
-function testResults()
+function retrieveFromJson(category = undefined,subcategory = undefined)
 {
-    var retval='Return:';
-     var keys = skill_files.content().CATEGORIES_INFO;
-     retval+=typeof(keys);
-    /*return keys.length+','; */
-    for (var i=0;i<keys.length;i++)
-        retval += i+','+keys[i].english_title+'.';
-    return retval;
-    /* const category_names = skill_files.content != undefined ? Object.keys(skill_files.content) : undefined;
-    
-    if (category_names == undefined)
-    {
-        return 'undefined';
+    if (category == undefined)
+    {//return the categories info section for all categories
+        //categories info is static sectino in all json vocabulary files created
+        return skill_files.content().CATEGORIES_INFO;
     }
-    else
-    {
-        for (var i=0;i<category_names.length ;i++)
-        {
-            retval +=category_names[i]+',';
-        }
-        return retval+","+category_names;
+    else if(category!= undefined && subcategory == undefined)
+    {//category given, must retrieve the category section.
+        const keys = Object.keys(skill_files.content());
+        //to skip the categories_info section 
+        for (var i=1; i<keys.length; i++)
+            if (keys[i].toUpperCase() == category.toUpperCase().split(" ").join("_"))
+            {//found here
+                return Object.values(skill_files.content())[i];
+            }
+        return 'false';
+    }
+    /* else if (category != undefined && subcategory != undefined)
+    {//category given and subcategory. to retrieve a part of the category section
+        const keys = Object.keys(skill_files.content());
+        //to skip the categories_info section 
+        for (var i=1; i<keys.length; i++)
+            if (keys[i].toUpperCase() == category.toUpperCase().split(" ").join("_"))
+            {//found here
+                const  Object.values(skill_files.content())[i];
+            }
+        return 'false';
     } */
+    else
+        return 'false';
 }
+
+
+function infoFound(query_response, category_list)
+{
+    for (var i=0; i<category_list.length/2; i++)
+    {
+        if (category_list[i].toUpperCase() == query_response.toUpperCase()
+            || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase())
+            return category_list[i].toUpperCase() == query_response.toUpperCase() ? i : category_list.length/2+i;
+    }
+    return 'false';
+}
+function createReturnList(option,sessionAttributes,section_info,return_option)
+{
+    //2 languages to check in the categories info list.
+    const learning_language = sessionAttributes.learning_language;
+    const native_language = sessionAttributes.native_language;
+
+    var learning_list = [section_info.length];
+    var native_list = [section_info.length];
+    //get the categories info section from json.
+    if (learning_language != undefined && native_language != undefined)
+    {   
+        for (var i=0; i < section_info.length; i++)
+        {
+            const learning_title = languageProvider(learning_language,section_info[i],option);
+            const native_title = languageProvider(native_language,section_info[i],option);
+            if (native_title)//adding to native array
+            {
+                native_list[i]=removeSSML(native_title);
+            }
+            if (learning_title)//adding to native array
+            {
+                learning_list[i]=removeSSML(learning_title);
+            }    
+        }
+        if (return_option == "all")
+            return native_list.concat(learning_list);
+        else if (return_option == "native")
+            return native_list;
+        else if (return_option == "learning")
+            return learning_list;
+    }
+    return 'false';
+}
+
+function removeSSML(ssmltext)
+{
+    //index variable to remove the ssml tags from the values
+    var index = ssmltext.indexOf('<');
+    let tag;
+    while(index!=-1)
+    {
+        //to cleanse the text 
+        tag = ssmltext.substring(index,ssmltext.indexOf('>')+1); 
+        ssmltext = ssmltext.replace(tag,"");
+        index = ssmltext.indexOf('<');
+    }
+    return ssmltext;
+}
+
 const UserSubcategorySelectionIntent = {
     canHandle(handlerInput)
     {
@@ -163,13 +265,68 @@ const UserSubcategorySelectionIntent = {
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
-
+        var out="";
         const query_response = slots['query'].value;
-        out = "user subcategory:"+query_response;
-        return handlerInput.responseBuilder
+        //check for category to be defined first
+        if (sessionAttributes.category)
+        {
+            const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
+            const position = infoFound(query_response,subcategory_list);
+            if (position!="false")
+            {
+                out+= 'subcategory selected:'+subcategory_list[position];
+            }
+            else
+                out+= 'subcategory not found, repeat again please';
+        }
+        else
+            out+='category not configured';
+        
+        
+        return handlerInput.responseBuilder 
         .withShouldEndSession(false)
-        .speak(out)
+        .speak(""+out)
         .getResponse();
+    }
+}
+const showCategoriesIntent ={
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+        && handlerInput.requestEnvelope.request.intent.name === 'ShowCategoriesIntent';
+    },
+    handle(handlerInput)
+    { 
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+        const option = slots['option'].value;
+        var output;
+        if (option)
+        {//option is given. Always true
+            let section;
+            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"categories").toUpperCase() 
+                || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase())
+            {//category keyword given correctly
+                section =  createReturnList('category',sessionAttributes,retrieveFromJson(),"native");
+                output = "showing categories:";
+            }
+            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategories").toUpperCase()
+                || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategories").toUpperCase())
+            {
+                section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes.category),"native");
+                output = "showing subcategories";
+            }
+            if (section != undefined)
+            {
+                output+=section;
+            }
+            return handlerInput.responseBuilder 
+            .withShouldEndSession(false)
+            .speak(output)
+            .getResponse();
+        }
+
     }
 }
 const FallbackHandler = {
@@ -1154,7 +1311,7 @@ const DetailsIntent = {
                             handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                             output = switchVoice(sessionAttributes.learning_word,sessionAttributes);
                         }
-                        level = "strong";
+                        //level = "strong";
                     }
                     else if (detail.toUpperCase() == checkEditor("details_list",sessionAttributes.native_language,"phrase").toUpperCase()
                         || detail.toUpperCase() == checkEditor("details_list",sessionAttributes.learning_language,"phrase").toUpperCase())
@@ -1177,7 +1334,7 @@ const DetailsIntent = {
                             handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                             output = switchVoice(sessionAttributes.learning_phrase,sessionAttributes);
                         }    
-                        level = "strong";
+                        //level = "strong";
                     }
                     else
                         output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
@@ -1478,6 +1635,7 @@ exports.handler = skillBuilder
     UserSelectionIntent,
     UserCategorySelectionIntent,
     UserSubcategorySelectionIntent,
+    showCategoriesIntent,
     //ShowCategories,
     RepeatMessageIntent,
     //SelectCategoryIntent,

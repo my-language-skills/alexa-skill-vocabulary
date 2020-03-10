@@ -1,5 +1,8 @@
 # alexa-skill-vocabulary
-### current version: 1.0
+* Conrtibutors: @CharalamposTheodorou
+* Tags: alexa, skill, amazon
+* Current version: 1.1
+
 ## Description:
 - Amazon Alexa skill for learning Vocabulary.
 - Vocabulary is provided in 5 languages. (English/Spanish/German/French/Italian).
@@ -20,6 +23,11 @@ All requests can be given in both native or learning language except when:
 
 
 ## Versions
+ * 1.1:
+    * Changes:
+        - New language editor temp file, updated way to handle intentions (with option for dynamic usage of categories or subcategories available)
+        - In index file, updated way to handle the intents and requirement files (to not load everything every time, a part of the file so that the process is not overwhelmed)
+
  * 1.0:
     * Json Editors for Alexa:
         - 5 language editor files.

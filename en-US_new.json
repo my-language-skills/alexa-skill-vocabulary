@@ -1,0 +1,620 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "lexicon",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelpIntent",
+                    "slots": [
+                        {
+                            "name": "help_options",
+                            "type": "help_options_list"
+                        }
+                    ],
+                    "samples": [
+                        "{help_options}"
+                    ]
+                },
+                {
+                    "name": "UserSelectionIntent",
+                    "slots": [
+                        
+                        {
+                            "name": "random",
+                            "type": "random_list"
+                        },
+                        {
+                            "name": "option_selection",
+                            "type": "random_option_list"
+                        }
+                    ],
+                    "samples" :[
+                        "{option_selection} {random}",
+                        "{random} {option_selection}",
+                        "{option_selection}"
+                    ]
+                },
+                {
+                    "name": "UserCategorySelectionIntent",
+                    "slots": [
+                        {
+                            "name": "query",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples" :[
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}"
+                    ]
+                },
+                {
+                    "name": "UserSubcategorySelectionIntent",
+                    "slots": [
+                        {
+                            "name": "query",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples" :[
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}"
+                    ]
+                },
+                {
+                    "name": "ShowCategoriesIntent",
+                    "slots":[
+                        {
+                            "name": "option",
+                            "type": "option_list"
+                        }
+                    ],
+                    "samples": [
+                        "{option}",
+                        "show {option}",
+                        "demostrar {option}",
+                        "démontrer {option}",
+                        "zeigen {option}",
+                        "mostrare {option}",
+                        "{option} list",
+                        "{option} Liste",
+                        "{option} lista",
+                        "show all {option}",
+                        "mostrar todo {option}",
+                        "Afficher tout {option}",
+                        "zeige alles {option}",
+                        "mostra tutto {option}"
+                    ]
+                },                
+                {
+                    "name": "RepeatMessageIntent",
+                    "slots": [
+                        {
+                            "name": "Repeat",
+                            "type": "Repeat_List"
+                        },
+                        {
+                            "name": "speed",
+                            "type": "speed_list"
+                        },
+                        {
+                            "name": "volume",
+                            "type": "volume_list"
+                        }
+                    ],
+                    "samples": [
+                        "{Repeat}",
+                        "{Repeat} {speed}",
+                        "{Repeat} {volume}",
+                        "{speed}",
+                        "{volume}"
+                    ]
+                },
+                {
+                    "name": "ExampleIntent",
+                    "slots": [
+                        {
+                            "name": "continue",
+                            "type": "continue_in_sub_list"
+                        },
+                        {
+                            "name": "random",
+                            "type": "random_list"
+                        }
+                    ],
+                    "samples": [
+                        "{random}",
+                        "{continue}",
+                        "{random} {continue}",
+                        "{continue} {random}",
+                        "{continue} subcategory",
+                        "subcategory {continue}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "DetailsIntent",
+                    "slots": [
+                        {
+                            "name": "detail",
+                            "type": "details_list"
+                        },
+                        {
+                            "name": "language",
+                            "type": "language_list"
+                        }
+                    ],
+                    "samples": [
+                        "{detail}",
+                        "{language} {detail}"
+                    ]
+                },
+                {
+                    "name": "IndexIntent",
+                    "slots": [
+                        {
+                            "name": "request",
+                            "type": "request_list"
+                        }
+                    ],
+                    "samples": [
+                        "{request}",
+                        "what is my {request}",
+                        "show me {request}",
+                        "Muéstrame {request}",
+                        "montre moi {request}",
+                        "Zeig es mir {request}",
+                        "fammi vedere {request}"
+                    ]
+                },
+                {
+                    "name": "LanguageSelectionIntent",
+                    "slots": [
+                        {
+                            "name": "language",
+                            "type": "language_list"
+                        },
+                        {
+                            "name": "language_type",
+                            "type": "language_type_list"
+                        }
+                    ],
+                    "samples": [
+                        "learn {language}",
+                        "aprender {language}",
+                        "apprendre {language}",
+                        "lernen {language}",
+                        "imparare {language}",
+                        "change {language_type} language to {language}",
+                        "Cambia  {language_type} lingua to {language}",
+                        "ändere {language_type} Sprache to {language}",
+                        "cambio {language_type} lengua to {language}",
+                        "changer  {language_type} langue  to {language}",
+                        "{language_type} language to {language}",
+                        "{language_type} lingua to {language}",
+                        "{language_type} Sprache to {language}",
+                        "{language_type} lengua to {language}",
+                        "{language_type} langue to {language}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "language_type_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "native",
+                                "synonyms": ["nativa", "local","gebürtig","nativa"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "mother",
+                                "synonyms": ["madre","mère","Mutter", "madre"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "teaching",
+                                "synonyms": ["enseñando","enseignement","Lehren","insegnamento"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "second",
+                                "synonyms": ["segunda","seconde","zweite","seconda"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "learning",
+                                "synonyms": ["aprendizaje", "seconde","Lernen","apprendimento"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "categories_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "existential notions",
+                                "synonyms": ["NOCIONES EXISTENCIALES"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "quantitative",
+                                "synonyms": ["NOCIONES CUANTITATIVAS"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "speed_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "faster",
+                                "synonyms": ["más rápido","plus rapide","schneller","Più veloce"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "slower",
+                                "synonyms": ["más lento","Ralentissez","Langsamer","Più lentamente"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "volume_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "louder",
+                                "synonyms": ["mas fuerte","Plus fort","lauter","più forte"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "quieter",
+                                "synonyms": ["más tranquilo","plus tranquille","leiser","più tranquillo"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "help_options_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "help",
+                                "synonyms": ["ayuda","Aidez-moi","Hilfe","Aiuto"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "instructions",
+                                "synonyms": ["instrucciones","instructions","Anleitung","Istruzioni"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "options",
+                                "synonyms": ["opciones","options","Optionen","opzioni"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "request_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "current category",
+                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle Kategorie","categoria attuale"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current subcategory",
+                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle Unterkategorie","sottocategoria corrente"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current example",
+                                "synonyms": ["ejemplo actual","exemple actuel","aktuelles Beispiel","esempio attuale"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "native language",
+                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","lingua nativa"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "mother language",
+                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","madre lingua"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "learning language",
+                                "synonyms": ["aprendiendo idioma","apprendre une langue","Sprache lernen","apprendimento della lingua"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "language list",
+                                "synonyms": ["lista de idiomas","liste des langues","Sprachliste","elenco delle lingue"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "category list",
+                                "synonyms": ["Lista de categoría","liste des catégories","Kategorieliste","elenco di categorie"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "details_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "word",
+                                "synonyms": ["palabra","mot","Wort","parola"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "phrase",
+                                "synonyms": ["frase","frase","Phrase","frase"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "continue_in_sub_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "another",
+                                "synonyms": ["Otro","autre","weiterer","altro"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "next",
+                                "synonyms": ["siguiente","suivant","Nächster","prossimo"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "start",
+                                "synonyms": ["comienzo","début","Start","inizio"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "language_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "english",
+                                "synonyms": ["inglés","Anglais","Englisch","inglese"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "spanish",
+                                "synonyms": ["español","Espagnol","Spanisch","spagnolo"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "italian",
+                                "synonyms": ["italiano","italien","Italienisch","italiano"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "french",
+                                "synonyms": ["francés","Français","Französisch","francese"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "german",
+                                "synonyms": ["aleman","allemand","Deutsche","tedesca"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "continue_in_cat_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "next category",
+                                "synonyms": ["siguiente categoría","catégorie suivante","nächste Kategorie","prossima categoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "another category",
+                                "synonyms": ["otra categoría","autre catégorie","andere Kategorie","altra categoria"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "option_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "categories",
+                                "synonyms": ["categorías","catégories","Kategorien","categorie"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "subcategories",
+                                "synonyms": ["subcategorias","sous-catégories","Unterkategorien","sottocategorie"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "random_option_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "category",
+                                "synonyms": ["categoría","Catégorie","Kategorie","categoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "subcategory",
+                                "synonyms": ["subcategoría","sous-catégorie","Unterkategorie","sottocategoria"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Repeat_List",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "repeat",
+                                "synonyms": ["repetir","répéter","wiederholen","ripetere"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "again",
+                                "synonyms": ["otra vez","encore","nochmal","ancora"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "repeat again",
+                                "synonyms": ["repite otra vez","répète encore","nochmals wiederholen","ripeti ancora"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "repeat normal",
+                                "synonyms": ["repetir normal","répéter normal","wiederhole normal","ripeti normale"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "sub_categories_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "existence, lack of existence",
+                                "synonyms": ["Existencia, inexistencia"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "presence, absence",
+                                "synonyms": ["Presencia, ausencia"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "general quality",
+                                "synonyms": ["Cualidad general"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "event",
+                                "synonyms": ["Acontecimiento"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "certainty, uncertainty",
+                                "synonyms": ["Certeza, incertidumbre"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "numerical quantity",
+                                "synonyms": ["Numerical quantity"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "cardinal numbers",
+                                "synonyms": ["Números cardinales"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "ordinal numbers",
+                                "synonyms": ["Números ordinales"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "relative quantity",
+                                "synonyms": ["Cantidad relativa"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "degree",
+                                "synonyms": ["Grado"]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "random_list",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "random",
+                                "synonyms": ["aleatorio","Aléatoire","zufällig","casuale"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "shuffle",
+                                "synonyms": ["barajar","mélanger","Mischen","rimescolare"]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
