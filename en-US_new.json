@@ -131,17 +131,31 @@
                             "type": "continue_in_sub_list"
                         },
                         {
-                            "name": "random",
+                            "name": "random_example",
                             "type": "random_list"
                         }
                     ],
                     "samples": [
-                        "{random}",
-                        "{continue}",
-                        "{random} {continue}",
-                        "{continue} {random}",
-                        "{continue} subcategory",
-                        "subcategory {continue}"
+                        "{random_example} example",
+                        "{continue} ",
+                        "{random_example} {continue} example",
+                        "{continue} {random_example} example",
+                        "{random_example} ejemplo",
+                        "{continue} ",
+                        "{random_example} {continue} ejemplo",
+                        "{continue} {random_example} ejemplo",
+                        "{random_example} exemple",
+                        "{continue} ",
+                        "{random_example} {continue} exemple",
+                        "{continue} {random_example} exemple",
+                        "{random_example} aktuelles",
+                        "{continue} ",
+                        "{random_example} {continue} aktuelles",
+                        "{continue} {random_example} aktuelles",
+                        "{random_example} esempio",
+                        "{continue} ",
+                        "{random_example} {continue} esempio",
+                        "{continue} {random_example} esempio"
                     ]
                 },
                 {
