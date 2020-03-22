@@ -11,7 +11,9 @@ const content_language_strings = require('./language_strings').CONTENT;
 const editor_translations = require('./editor_options').CONTENT;
 const content_categories_info =  content.CONTENT.CATEGORIES_INFO;
 
+//includes the file that loads any custom content file.
 const skill_files = require('./requirer');
+
 /**
  * Setup for const value for content files..
  * 
@@ -36,7 +38,7 @@ const languageString = {
         translation: {
             INITIAL_LANGUAGE: "español",//language of alexa
             INITIAL_LANGUAGE_ENGLISH: "spanish",
-            NATIVE_VOICE: "Conchita",
+            NATIVE_VOICE: "Lucia",
             SKILL_NAME: 'Lexicon',
             EXISTENTIAL_NOTIONS: content.CONTENT.EXISTENTIAL_NOTIONS,
             QUANTITATIVE: content.CONTENT.QUANTITATIVE,
@@ -47,7 +49,7 @@ const languageString = {
         translation: {
             INITIAL_LANGUAGE: "italiano",//language of alexa
             INITIAL_LANGUAGE_ENGLISH: "italian",
-            NATIVE_VOICE: "Giorgio",
+            NATIVE_VOICE: "Carla",
             SKILL_NAME: 'Lexicon',
             EXISTENTIAL_NOTIONS: content.CONTENT.EXISTENTIAL_NOTIONS,
             QUANTITATIVE: content.CONTENT.QUANTITATIVE,
@@ -78,263 +80,604 @@ const languageString = {
     },
   };
 
-
 // INTENTS
 
 /**
- * Custom intent to select random category/subcategory
+ * Internal Alexa skill intent that triggers when an error occurs during runtime
  */
-const UserSelectionIntent = {
-    canHandle(handlerInput)
-    {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'UserSelectionIntent';
+const FallbackHandler = {
+
+    // 2018-May-01: AMAZON.FallackIntent is only currently available in en-US locale.
+  
+    //              This handler will not be triggered except in that locale, so it can be
+  
+    //              safely deployed for any locale.
+  
+    canHandle(handlerInput) {
+  
+      const request = handlerInput.requestEnvelope.request;
+      return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.FallbackIntent';
     },
-    handle(handlerInput)
-    {   
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const slots = handlerInput.requestEnvelope.request.intent.slots;
-        /* Const values for slots*/
-        const option = slots['option_selection'].value;
-
-        let category = sessionAttributes.category;
-        let subcategory = sessionAttributes.subcategory;
-        var output="";
-        
-        // if learning language selected doesn't show anything here..
-        if (sessionAttributes.learning_language == "none")
-        {
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
-        }
-        else
-        {//learning language set, safe to proceed
-            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"category").toUpperCase() 
-                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"category").toUpperCase())
-            {//option is given in native or learning language for keyword category
-                const section = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
-                if (section != undefined)
-                {
-                    category = section[Math.floor(Math.random()*section.length)];
-                    //message for new category selection
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
-                    //message for subcategory list available
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
-                    //get subcategory list.
-                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    if (subcategory_list != undefined)
-                    {
-                        for (var i=0; i< subcategory_list.length; i++)
-                        {
-                            output += i==0 ? " " : ", ";
-                            output +=subcategory_list[i].replace(","," and")+" ";
-                        }
-                    }
-                    else       
-                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-                }
-                else 
-                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-            }
-            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategory").toUpperCase()
-                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategory").toUpperCase())
-            {//option is given in native or learning language for keyword subcategory
-                if (category != undefined)
-                {//category is set. moving to randomizing subcategories
-                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    if (subcategory_list!= undefined)
-                    {
-                        subcategory = subcategory_list[Math.floor(Math.random()*subcategory_list.length)];
-                        //message for new category selection
-                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
-                    }
-                }
-                else
-                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
-            }
-            else
-            {//return message for wrong keyword
-                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-            }
-        }
-        //update values of session attributes
-        Object.assign(sessionAttributes,
-        {
-            lastmsg: output,
-            helpmsg: "UserSelection",
-            category: category,
-            subcategory: subcategory,
-            voice: retrieve_Strings("voices",sessionAttributes.native_language),
-            break: 0,
-        });
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-        //setting appropriate voice for the return message.
-        output = switchVoice(output,sessionAttributes);
+    handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes(); 
         return handlerInput.responseBuilder
-        .withShouldEndSession(false)
-        .speak(output)
+        .speak(retrieve_Strings("general",sessionAttributes.native_language,"fallback"))
         .getResponse();
-    }
-}
+    },
+};
 
 /**
- * Custom Intent to handle the user request to select a new category
- * Onlt triggered when given the command to set a category
+ * Responsible to setup the locale of the skill's initial speaking language 
  */
-const UserCategorySelectionIntent = {
+let LocalizationInterceptor = {
+    process(handlerInput) {
+      const localizationClient = i18n.use(sprintf).init({
+        lng: handlerInput.requestEnvelope.request.locale,
+        overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
+        resources: languageString, 
+        returnObjects: true
+      });
+  
+      const attributes = handlerInput.attributesManager.getRequestAttributes();
+      attributes.t = function (...args) {
+        return localizationClient.t(...args);
+      };
+    },
+};
+
+/**
+ * Handles real-time application errors and shows the results to the user.
+ */
+const ErrorHandler = {
+    canHandle() {
+      return true;
+    },
+    handle(handlerInput, error) {
+      console.log(`Error handled: ${error.message}`);
+    
+      const sessionAttributes = handlerInput.attributesManager.getSessionAttributes(); 
+      return handlerInput.responseBuilder
+        .speak("Run-Time Error: "+error.message)
+        .getResponse();
+    },
+};
+
+/**
+ * Intent that is triggered when the user cancels/ends session
+ */
+const SessionEndedRequest = {
+    canHandle(handlerInput) {
+      return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+    },
+    handle(handlerInput) {
+        const output = `Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`;
+      console.log(output);
+  
+      return handlerInput.responseBuilder
+        .speak(output)
+        .withShouldEndSession(true)
+        .getResponse();
+    },
+};
+
+/**
+ * Intent is triggered when user chooses to cancel and stop the operation of the skill
+ */
+const CancelAndStopIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
+    },
+    handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+        return handlerInput.responseBuilder
+            .withShouldEndSession(true)
+            .speak(retrieve_Strings("warnings",sessionAttributes.native_language,"cancel_stop"))
+            .getResponse();
+    },
+};
+
+/** CUSTOM INTENTS */
+
+/**
+ * Custom Intent to show help/options for each specific location in the process.
+ * And according to user input.
+ */
+const HelpIntent = {
+    canHandle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+  
+        return request.type === 'IntentRequest' && (request.intent.name === 'AMAZON.HelpIntent' || request.intent.name === 'HelpIntent');
+    },
+    handle(handlerInput) {
+        
+        let helpmsg;
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+        //option requested by the user
+        let options = slots['help_options'].value;
+
+        //check if keyword for options slot given in native or learning language
+        if (options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"help").toUpperCase() 
+            || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"help").toUpperCase())
+        { //to show help messages.
+            if (sessionAttributes.helpmsg == "Launch")
+            {
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"launch");
+            }
+            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
+            {
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
+            }
+            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
+            {
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories" );
+            }
+            else if (sessionAttributes.helpmsg == "ExampleIntent")
+            {
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"example");
+            }
+            else if (sessionAttributes.helpmsg == "DetailsIntent")
+                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"details")+retrieve_Strings("help",sessionAttributes.native_language,"example");
+            else if (sessionAttributes.helpmsg == "IndexIntent")
+                if (sessionAttributes.learning_language == "none")
+                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"lauch");
+                else
+                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
+            else if (sessionAttributes.helpmsg == "LanguageSelection")
+            {//check if selected a category or a subcategory.. or an example, give option to continue where left off
+                if (sessionAttributes.reset == false)
+                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"resume");
+                else
+                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"reset");
+            }
+            helpmsg+= retrieve_Strings("general",sessionAttributes.native_language,"options");
+        }
+        else if (options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"options").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"options").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"instructions").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"instructions").toUpperCase())
+        {//to give instructions...
+            if (sessionAttributes.helpmsg == "Launch")
+            {
+                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"welcome");
+            }
+            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
+            {
+                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
+            }
+            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
+            {
+                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"select_categories");
+            }
+            else if (sessionAttributes.helpmsg == "ExampleIntent")
+            {
+                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"example")+retrieve_Strings("options",sessionAttributes.native_language,"details");
+            }
+            else if (sessionAttributes.helpmsg == "DetailsIntent")
+                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"details")+retrieve_Strings("options",sessionAttributes.native_language,"example");
+            else if (sessionAttributes.helpmsg == "IndexIntent")
+                if (sessionAttributes.learning_language == "none")
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"welcome");
+                else if (sessionAttributes.subcategory != undefined)
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"index");
+                else
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
+            else if (sessionAttributes.helpmsg == "LanguageSelection")
+            {
+                if (sessionAttributes.reset == false)
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"resume");
+                else
+                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"reset");
+            }
+        }
+        else
+            helpmsg = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+        Object.assign(sessionAttributes,
+        {
+            lastmsg: helpmsg,
+            break: 0,
+            voice: retrieve_Strings("voices",sessionAttributes.native_language,false),
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        //setting the return help/options message in correct voice attributes
+        helpmsg = switchVoice(helpmsg,handlerInput.attributesManager.getSessionAttributes());
+        return handlerInput.responseBuilder
+            .withShouldEndSession(false)
+            .speak(helpmsg)
+            .getResponse();
+    },
+};
+
+/**
+ * Custom Intent to repeat last message given to the user.
+ * Checks user preference in speed and volume before repeating..
+ * User can select to hear it faster/slower or louder/quieter.
+ */
+const RepeatMessageIntent = {
     canHandle(handlerInput)
     {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'UserCategorySelectionIntent';
+          && handlerInput.requestEnvelope.request.intent.name === 'RepeatMessageIntent';
     },
     handle(handlerInput)
-    {   
+    {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
+        const speed = slots['speed'].value;
+        const volume = slots['volume'].value;
+        const repeat = slots['Repeat'].value;
 
-        //the value of query_response should be a category name
-        const query_response = slots['query'].value;
-        let category = sessionAttributes.category;
-        let output = "";
+        let repeat_rate = sessionAttributes.rate;
+        let repeat_volume = sessionAttributes.volume;
+        let output = sessionAttributes.lastmsg != undefined ? sessionAttributes.lastmsg : retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");        
         
-        // if learning language selected doesn't show anything here..
-        if (sessionAttributes.learning_language == "none")
+        if (speed!= undefined)
         {
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+            if (speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.native_language,"faster").toUpperCase() || speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.learning_language,"faster").toUpperCase())
+            {//faster
+                for (let i =0;i<rate_levels.length;i++)
+                    if (sessionAttributes.rate == rate_levels[i])
+                        if (i==rate_levels.length-1)
+                            repeat_rate = rate_levels[i];
+                        else
+                            repeat_rate = rate_levels[i+1];
+            }
+            else if (speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.native_language,"slower").toUpperCase() || speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.learning_language,"slower").toUpperCase())
+            {//slower
+                for (let i =0;i<rate_levels.length;i++)
+                if (sessionAttributes.rate == rate_levels[i])
+                    if (i==0)
+                        repeat_rate = rate_levels[0];
+                    else
+                        repeat_rate = rate_levels[i-1];
+            }
+            else
+                output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request")+". But sure..:"+output;
+
+        }
+        else if (volume != undefined)
+        {
+            if (volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.native_language,"louder").toUpperCase() || volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.learning_language,"louder").toUpperCase()) 
+            {//louder
+                for (let i=0;i<volume_levels.length;i++)
+                {
+                    if (sessionAttributes.volume == volume_levels[i])
+                        if (i==volume_levels.length-1)
+                            repeat_volume = volume_levels[i];
+                        else
+                            repeat_volume = volume_levels[i+1];
+                }
+            }
+            else if (volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.native_language,"quieter").toUpperCase() || volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.learning_language,"quieter").toUpperCase())
+            {//quieter
+                for (let i=0;i<volume_levels.length;i++)
+                {
+                    if (sessionAttributes.volume == volume_levels[i])
+                        if (i==0)
+                            repeat_volume = volume_levels[0];
+                        else
+                            repeat_volume = volume_levels[i-1];
+                }
+            }
+            else
+                output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+        }
+        else if (repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat").toUpperCase() 
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat").toUpperCase()
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"again").toUpperCase() 
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"again").toUpperCase()
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat again").toUpperCase() 
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat again").toUpperCase()
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat normal").toUpperCase() 
+        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat normal").toUpperCase())
+        {
+            repeat_rate = "100%";
+            repeat_volume = "medium";
         }
         else
-        {//learning language is configured, safe to proceed
-            //getting all categories names in native and learning language
-            const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"all");
-            if (category_list != undefined)
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+
+        Object.assign(sessionAttributes,
             {
-                const position = infoFound(query_response,category_list);
-                if (position != undefined)
-                {//category requested is found. update values
-                    category = category_list[position];
-                    //message for new category selection
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
-                    //message for subcategory list available
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
-                    //get subcategory list.
-                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    if (subcategory_list != undefined)
+                break:1,
+                rate:repeat_rate,
+                volume: repeat_volume,
+            });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        //setting up the return message with appropriate voice attributes.
+        output = switchVoice(output,handlerInput.attributesManager.getSessionAttributes());
+        return handlerInput.responseBuilder
+            .withShouldEndSession(false)
+            .speak(output)
+            .getResponse();
+    },
+};
+
+/**
+ * Starting point of application
+ * Intent to Launch Skill.
+ * Shows initial welcoming messages, in the default language of alexa and sets
+ * the speaking language (native) to the default
+ */
+const LaunchRequest = {
+    canHandle(handlerInput)
+    {
+        const {request} = handlerInput.requestEnvelope;
+        return request.type === 'LaunchRequest'
+        || (request.type === 'IntentRequest' && request.intent.name === 'AMAZON.StartOverIntent');
+    },
+    handle(handlerInput)
+    {
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let output = requestAttributes.t("WELCOME",requestAttributes.t("SKILL_NAME"),requestAttributes.t("INITIAL_LANGUAGE"))+retrieve_Strings("help",requestAttributes.t("INITIAL_LANGUAGE"),"launch");
+        Object.assign(sessionAttributes,
+            {
+                lastmsg: output,
+                helpmsg: "Launch",
+                voice: requestAttributes.t("NATIVE_VOICE"),
+                learning_language: "none",
+                native_language: requestAttributes.t("INITIAL_LANGUAGE_ENGLISH"),
+                native_name: requestAttributes.t("INITIAL_LANGUAGE"),
+                learning_name: "none",
+                break: 0,
+                rate: "100%",
+                volume: "medium",
+            });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        //setting up the return message of Alexa with appropriate voice attributes.
+        output = switchVoice(output,handlerInput.attributesManager.getSessionAttributes());
+
+        return handlerInput.responseBuilder    
+            .withShouldEndSession(false)
+            .speak(output) 
+            .getResponse();
+    },
+};
+
+/**
+ * Custom Intent to change Native or Learning language
+ */
+const LanguageSelectionIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'LanguageSelectionIntent';
+    },
+    handle(handlerInput)
+    {
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+        const language = slots['language'].value;
+        const type = slots['language_type'].value;
+        let output = "";
+        let native=sessionAttributes.native_language;
+        let learning= sessionAttributes.learning_language;
+        let native_name=sessionAttributes.native_name
+        let learning_name=sessionAttributes.learning_name;
+        let reset = false;
+        let category = sessionAttributes.category;
+        let subcategory = sessionAttributes.subcategory;
+
+        let language_request_english = returnSpokenLanguage(language); //language that the request was given. (in english)
+        
+       
+        
+        if (language_request_english == "unidentified" || language_request_english == undefined 
+            || language_request_english.toUpperCase() != native.toUpperCase()) 
+        {
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request")+retrieve_Strings("warnings",sessionAttributes.native_language,"given_request")+retrieve_Strings("translation",sessionAttributes.native_language,language_request_english)+". ";
+        }
+        else
+        {
+            if (language != undefined && type !=undefined)
+            {
+                if (type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"native").toUpperCase()
+                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"native").toUpperCase()
+                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"mother").toUpperCase()
+                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"mother").toUpperCase())
+                {
+                    if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"native_warn")+language+". ";
+                    else if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                        output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection");
+                    else
                     {
-                        for (var i=0; i< subcategory_list.length; i++)
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"native_selection")+language+". ";
+                        native_name = language;
+                        native = retrieve_Strings("translation",language,"return");
+                        if (category != undefined)
                         {
-                            output += i==0 ? " " : ", ";
-                            output +=subcategory_list[i].replace(","," and")+" ";
+                            let new_cat;
+
+                            //to get previous category info.. and change the category name..
+                            let info = getInfo(requestAttributes,sessionAttributes,category,undefined,0);
+                            new_cat = languageProvider(native,info,"category");
+                            if (subcategory != undefined)
+                            {
+                                // get previous subcategory info to change name..
+                                info = getInfo(requestAttributes,sessionAttributes,category,subcategory,0);
+                                subcategory = languageProvider(native,info,"title");
+                            }
+                            category = new_cat;
                         }
                     }
+                }
+                else if  (type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"teaching").toUpperCase()
+                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"teaching").toUpperCase()
+                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"second").toUpperCase()
+                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"second").toUpperCase()
+                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"learning").toUpperCase()
+                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"learning").toUpperCase())
+                {   //request to change learning language
+                    
+                    if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_warn")+language+". ";//same selection as before
+                    else if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                        output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //both languages are the same
                     else
-                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    {//correct selection
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
+                        learning_name = language;
+                        learning = retrieve_Strings("translation",language,"return");
+                        reset = true;
+                    }
                 }
                 else
-                {//category name given was not valid/not found, assume given in different language
-                    output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+            }
+            else if (type == undefined && language!= undefined)
+            {//learn "language", set learning language to this
+                // check if learning language is the same as before..
+                if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_warn")+language+". ";
+                else if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
+                    output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //if same selection for both languages
+                else
+                {
+                    output =  retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
+                    learning_name = language;
+                    learning = retrieve_Strings("translation",language,"return");
+                    reset = true;
                 }
+                //changes learning language only.
             }
-            else
-            {//return message for content error
-                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-            }
+            else//something wasn't given correctly
+                output= retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
         }
-        //update values of session attributes      
-        Object.assign(sessionAttributes,
-        {
-            lastmsg: output,
-            helpmsg: "UserSelectionCategory",
-            category: category,
-            subcategory: undefined,
-            voice: retrieve_Strings("voices",sessionAttributes.native_language),
-            break: 0,
-        });
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        
-        //setting appropriate voice for the return message.
-        output = switchVoice(output,sessionAttributes);
-        return handlerInput.responseBuilder 
-        .withShouldEndSession(false)
-        .speak(output)
-        .getResponse();
-    }
-}
 
-const UserSubcategorySelectionIntent = {
+        Object.assign(sessionAttributes,
+            {
+                native_language: native,
+                learning_language: learning,
+                native_name: native_name,
+                learning_name: learning_name,
+                lastmsg: output,
+                helpmsg: "LanguageSelection",
+                voice: retrieve_Strings("voices",native),
+                break: 0,
+                rate: "100%",
+                volume: "medium",
+                reset: reset,
+                category: category,
+                subcategory: subcategory,
+            });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        //if learning language change then all categories are changed.. (different info)
+        // so must reset all category and subcategory selections and reset the examples.
+        if (reset == true)
+        {
+            Object.assign(sessionAttributes,
+            {
+                category: undefined,
+                subcategory: undefined,
+            });
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+            output+= retrieve_Strings("warnings",sessionAttributes.native_language,"reset");
+        }
+
+        output = switchVoice(output+retrieve_Strings("language",native,"selection")+sessionAttributes.learning_name,sessionAttributes);
+        return handlerInput.responseBuilder 
+            .withShouldEndSession(false)
+            .speak(output)
+            .getResponse(); 
+    }
+};
+
+/**
+ * Custom Intent to show currrent category, subcategory, example, native and learning languages.
+ */
+const IndexIntent = {
     canHandle(handlerInput)
     {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'UserSubcategorySelectionIntent';
+          && handlerInput.requestEnvelope.request.intent.name === 'IndexIntent';
     },
     handle(handlerInput)
-    {   
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    {
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
         
-        //value of query_response must be a subcategory name
-        const query_response = slots['query'].value;
-        let subcategory = sessionAttributes.subcategory;
-        let output = "";
-        // if learning language selected doesn't show anything here..
-        if (sessionAttributes.learning_language == "none")
-        {
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        const request = slots['request'].value;
+        let output ="";
+        if (sessionAttributes.category != undefined && 
+            request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_category").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_category").toUpperCase() )
+        {//current category
+           output = request+" . "+sessionAttributes.category;
         }
-        else
-        {//learning language is configured, safe to proceed
-            //check for category to be defined first
-            if (sessionAttributes.category)
-            {//category is set
-                const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
-                if (subcategory_list != undefined)
-                {
-                    const position = infoFound(query_response,subcategory_list);
-                    if (position!= undefined)
-                    {//subcategory requested is found. 
-                        subcategory = subcategory_list[position];
-                        //message for new category selection
-                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
-                    }
-                    else
-                    {//category name given was not valid/not found, assume given in different language
-                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
-                        subcategory = undefined;
-                    }
-                }
-                else
-                {
-                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-                    subcategory = undefined;
-                }
-                
-            }
+        else if (sessionAttributes.subcategory != undefined && 
+            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_subcategory").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_subcategory").toUpperCase()))
+        {//current subcategory
+            output = request+" . "+sessionAttributes.subcategory;
+        }
+        else if (sessionAttributes.examples_ids != undefined && 
+            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_example").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_example").toUpperCase()))
+        {//current example
+            if (sessionAttributes.examples_ids.length>0)
+                output = request+" .  "+sessionAttributes.native_word;
             else
+                output = retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
+        }
+        else if (sessionAttributes.learning_language != undefined && 
+            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"learning_language").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"learning_language").toUpperCase()))
+        {//current learning language
+            output = request + " .  "+sessionAttributes.learning_name;
+        }
+        else if (sessionAttributes.native_language != undefined && 
+            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"native_language").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"native_language").toUpperCase()
+            ||request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"mother_language").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"mother_language").toUpperCase()))
+        {//current native language
+            output = request + " .  "+sessionAttributes.native_name;
+        }
+        else if (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"language_list").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"language_list").toUpperCase())
+        {//show language list
+            output = retrieve_Strings("language",sessionAttributes.native_language,"list");
+        }
+        else if (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"category_list").toUpperCase()
+        || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"category_list").toUpperCase())
+        {//show category list
+            let info = getInfo(requestAttributes,sessionAttributes,undefined,undefined,0,false);
+            output+= retrieve_Strings("general",sessionAttributes.native_language,"category_list")+". ";
+            for (let i=0;i<info.length; i++)
             {
-                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
-                subcategory = undefined;
+                output+=", "+languageProvider(sessionAttributes.native_language,info[i],"category");
             }
         }
-        
-        //update values of session attributes      
+        else //something was wrong in the selection of the user. information not available
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
+
         Object.assign(sessionAttributes,
-        {
-            lastmsg: output,
-            helpmsg: subcategory != undefined ? "UserSelectionSubcategory" : "ShowCategories",
-            subcategory: subcategory,
-            voice: retrieve_Strings("voices",sessionAttributes.native_language),
-            break: 0,
-        });
+            {
+                lastmsg: output,
+                helpmsg: "IndexIntent",
+                voice: retrieve_Strings("voices",sessionAttributes.native_language),
+                break: 0,
+                rate: "100%",
+                volume: "medium",
+            });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         
-        //setting appropriate voice for the return message.
+        
         output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder 
-        .withShouldEndSession(false)
-        .speak(output)
-        .getResponse();
-    }
-}
+            .withShouldEndSession(false)
+            .speak(output)
+            .getResponse();
+    },
+};
 
 /**
  * Custom Intent to handle the request to show the list of categories/subcategories.
@@ -419,353 +762,293 @@ const ShowCategoriesIntent ={
             .getResponse(); 
     }
 }
-const FallbackHandler = {
-
-    // 2018-May-01: AMAZON.FallackIntent is only currently available in en-US locale.
-  
-    //              This handler will not be triggered except in that locale, so it can be
-  
-    //              safely deployed for any locale.
-  
-    canHandle(handlerInput) {
-  
-      const request = handlerInput.requestEnvelope.request;
-      return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.FallbackIntent';
-    },
-    handle(handlerInput) {
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes(); 
-        return handlerInput.responseBuilder
-        .speak(retrieve_Strings("general",sessionAttributes.native_language,"fallback"))
-        .getResponse();
-    },
-};
-
-let LocalizationInterceptor = {
-    process(handlerInput) {
-      const localizationClient = i18n.use(sprintf).init({
-        lng: handlerInput.requestEnvelope.request.locale,
-        overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
-        resources: languageString, 
-        returnObjects: true
-      });
-  
-      const attributes = handlerInput.attributesManager.getRequestAttributes();
-      attributes.t = function (...args) {
-        return localizationClient.t(...args);
-      };
-    },
-};
-
-const ErrorHandler = {
-    canHandle() {
-      return true;
-    },
-    handle(handlerInput, error) {
-      console.log(`Error handled: ${error.message}`);
-    
-      const sessionAttributes = handlerInput.attributesManager.getSessionAttributes(); 
-      return handlerInput.responseBuilder
-        .speak("ERROR"+sessionAttributes.debug+": "+error.message)
-        .getResponse();
-    },
-};
-
-const SessionEndedRequest = {
-    canHandle(handlerInput) {
-      return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
-    },
-    handle(handlerInput) {
-      console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
-  
-      return handlerInput.responseBuilder.getResponse();
-    },
-};
 
 /**
- * Custom Intent to show help/options for each specific location in the process.
- * And according to user input.
+ * Custom intent to select random category/subcategory
  */
-const HelpIntent = {
-    canHandle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-  
-        return request.type === 'IntentRequest' && (request.intent.name === 'AMAZON.HelpIntent' || request.intent.name === 'HelpIntent');
-    },
-    handle(handlerInput) {
-       /*  
-        let speakOutput = requestAttributes.t('HELP_START'); 
-        handlerInput.attributesManager.setSessionAttributes(speakOutput); */
-        
-        let helpmsg;
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const slots = handlerInput.requestEnvelope.request.intent.slots;
-        let options = slots['help_options'].value;
-        if (options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"help").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"help").toUpperCase())
-        { //to show help messages.
-            if (sessionAttributes.helpmsg == "Launch")
-            {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"launch");
-            }
-            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
-            {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
-            }
-            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
-            {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories" );
-            }
-            else if (sessionAttributes.helpmsg == "ExampleIntent")
-            {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"example");
-            }
-            else if (sessionAttributes.helpmsg == "DetailsIntent")
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"details")+retrieve_Strings("help",sessionAttributes.native_language,"example");
-            else if (sessionAttributes.helpmsg == "IndexIntent")
-                if (sessionAttributes.learning_language == "none")
-                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"lauch");
-                else
-                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
-            else if (sessionAttributes.helpmsg == "LanguageSelection")
-            {//check if selected a category or a subcategory.. or an example, give option to continue where left off
-                if (sessionAttributes.reset == false)
-                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"resume");
-                else
-                    helpmsg = retrieve_Strings("help",sessionAttributes.native_language,"reset");
-            }
-            helpmsg+= retrieve_Strings("general",sessionAttributes.native_language,"options");
-        }
-        else if (options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"options").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"options").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.native_language,"instructions").toUpperCase() || options.toUpperCase() == checkEditor("help_options_list",sessionAttributes.learning_language,"instructions").toUpperCase())
-        {//to give instructions...
-            if (sessionAttributes.helpmsg == "Launch")
-            {
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"welcome");
-            }
-            else if (sessionAttributes.helpmsg == "ShowCategories" || sessionAttributes.helpmsg=="UserSelectionCategory")
-            {
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
-            }
-            else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
-            {
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"select_categories");
-            }
-            else if (sessionAttributes.helpmsg == "ExampleIntent")
-            {
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"example")+retrieve_Strings("options",sessionAttributes.native_language,"details");
-            }
-            else if (sessionAttributes.helpmsg == "DetailsIntent")
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"details")+retrieve_Strings("options",sessionAttributes.native_language,"example");
-            else if (sessionAttributes.helpmsg == "IndexIntent")
-                if (sessionAttributes.learning_language == "none")
-                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"welcome");
-                else if (sessionAttributes.subcategory != undefined)
-                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"index");
-                else
-                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
-            else if (sessionAttributes.helpmsg == "LanguageSelection")
-            {
-                if (sessionAttributes.reset == false)
-                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"resume");
-                else
-                    helpmsg = retrieve_Strings("options",sessionAttributes.native_language,"reset");
-            }
-        }
-        else
-            helpmsg = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-        Object.assign(sessionAttributes,
-            {
-                lastmsg: helpmsg,
-                break: 0,
-                rate: "100%",
-                volume: "medium",
-                voice: retrieve_Strings("voices",sessionAttributes.native_language,false),
-            });
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        
-        helpmsg = switchVoice(helpmsg,handlerInput.attributesManager.getSessionAttributes());
-        return handlerInput.responseBuilder
-            .speak(helpmsg)
-            .reprompt("HELP REPROMPT")
-            .getResponse();
-    },
-};
-
-
-const CancelAndStopIntentHandler = {
-    canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
-                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
-    },
-    handle(handlerInput) {
-  
-      return handlerInput.responseBuilder
-      .withShouldEndSession(true)
-        .speak("CANCEL AND STOP MESSAGE")
-        .getResponse();
-    },
-};
-
-/**
- * Custom Intent to repeat last message given to the user.
- * Checks user preference in speed and volume before repeating..
- * User can select to hear it faster/slower or louder/quieter.
- */
-const RepeatMessageIntent = {
+const UserSelectionIntent = {
     canHandle(handlerInput)
     {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'RepeatMessageIntent';
+          && handlerInput.requestEnvelope.request.intent.name === 'UserSelectionIntent';
     },
     handle(handlerInput)
-    {
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    {   
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const slots = handlerInput.requestEnvelope.request.intent.slots;
-        const speed = slots['speed'].value;
-        const volume = slots['volume'].value;
-        const repeat = slots['Repeat'].value;
+        /* Const values for slots*/
+        const option = slots['option_selection'].value;
 
-        let repeat_rate = sessionAttributes.rate;
-        let repeat_volume = sessionAttributes.volume;
-        let output ="Nothing to repeat";
-        if (sessionAttributes.lastmsg != undefined)
-            output = sessionAttributes.lastmsg;
+        let category = sessionAttributes.category;
+        let subcategory = sessionAttributes.subcategory;
+        let subcategory_ids = sessionAttributes.subcategory_ids ? sessionAttributes.subcategory_ids : [];
+        var output="";
         
-       
-        if (speed!= undefined)
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
         {
-            if (speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.native_language,"faster").toUpperCase() || speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.learning_language,"faster").toUpperCase())
-            {//faster
-                for (let i =0;i<rate_levels.length;i++)
-                    if (sessionAttributes.rate == rate_levels[i])
-                        if (i==rate_levels.length-1)
-                            repeat_rate = rate_levels[i];
-                        else
-                            repeat_rate = rate_levels[i+1];
-            }
-            else if (speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.native_language,"slower").toUpperCase() || speed.toUpperCase() == checkEditor("speed_list",sessionAttributes.learning_language,"slower").toUpperCase())
-            {//slower
-                for (let i =0;i<rate_levels.length;i++)
-                if (sessionAttributes.rate == rate_levels[i])
-                    if (i==0)
-                        repeat_rate = rate_levels[0];
-                    else
-                        repeat_rate = rate_levels[i-1];
-            }
-            else
-                output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request")+". But sure..:"+output;
-
-        }
-        else if (volume != undefined)
-        {
-            if (volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.native_language,"louder").toUpperCase() || volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.learning_language,"louder").toUpperCase()) 
-            {//louder
-                for (let i=0;i<volume_levels.length;i++)
-                {
-                    if (sessionAttributes.volume == volume_levels[i])
-                        if (i==volume_levels.length-1)
-                            repeat_volume = volume_levels[i];
-                        else
-                            repeat_volume = volume_levels[i+1];
-                }
-            }
-            else if (volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.native_language,"quieter").toUpperCase() || volume.toUpperCase() == checkEditor("volume_list",sessionAttributes.learning_language,"quieter").toUpperCase())
-            {//quieter
-                for (let i=0;i<volume_levels.length;i++)
-                {
-                    if (sessionAttributes.volume == volume_levels[i])
-                        if (i==0)
-                            repeat_volume = volume_levels[0];
-                        else
-                            repeat_volume = volume_levels[i-1];
-                }
-            }
-            else
-                output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-        }
-        else if (repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat").toUpperCase() 
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat").toUpperCase()
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"again").toUpperCase() 
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"again").toUpperCase()
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat again").toUpperCase() 
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat again").toUpperCase()
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.native_language,"repeat normal").toUpperCase() 
-        || repeat.toUpperCase() == checkEditor("repeat_list",sessionAttributes.learning_language,"repeat normal").toUpperCase())
-        {
-            repeat_rate = "100%";
-            repeat_volume = "medium";
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
         }
         else
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-
+        {//learning language set, safe to proceed
+            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"category").toUpperCase() 
+                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"category").toUpperCase())
+            {//option is given in native or learning language for keyword category
+                const section = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
+                if (section != undefined)
+                {
+                    //removing value of subcategory
+                    subcategory = undefined;
+                    //removing values of subcategories ids
+                    subcategory_ids = [];
+                    category = section[Math.floor(Math.random()*section.length)];
+                    //message for new category selection
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
+                    //message for subcategory list available
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    //get subcategory list.
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    
+                    if (subcategory_list != undefined)
+                    {
+                        for (var i=0; i< subcategory_list.length; i++)
+                        {//for showing the correct format of the subcategory name
+                            output += i==0 ? " " : ", ";
+                            output +=subcategory_list[i].replace(","," and")+" ";
+                        }
+                    }
+                    else       
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                }
+                else 
+                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+            }
+            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategory").toUpperCase()
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategory").toUpperCase())
+            {//option is given in native or learning language for keyword subcategory
+                if (category != undefined)
+                {//category is set. moving to randomizing subcategories
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    if (subcategory_list!= undefined)
+                    {
+                        const id = Math.floor(Math.random()*subcategory_list.length); //to set for array position
+                        subcategory = subcategory_list[id];
+                        subcategory_ids.push(id);
+                        //sorting the subcategory ids
+                        subcategory_ids.sort(sortIds);
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
+                    }
+                }
+                else
+                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
+            }
+            else
+            {//return message for wrong keyword
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+            }
+        }
+        //update values of session attributes
         Object.assign(sessionAttributes,
-            {
-                break:1,
-                rate:repeat_rate,
-                volume: repeat_volume,
-            });
+        {
+            lastmsg: output,
+            helpmsg: "UserSelection",
+            category: category,
+            subcategory: subcategory, //changing category, means reseting the subcategory name
+            subcategory_ids: subcategory_ids, //if category is changed then the subcategory_ids will be reset
+            examples_ids: [], //changing category or subcategory => reset the examples
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
+        });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-        output = switchVoice(output,handlerInput.attributesManager.getSessionAttributes());
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
         return handlerInput.responseBuilder
-            .withShouldEndSession(false)
-            .speak(output)
-            .getResponse();
-
-    },
-};
+        .withShouldEndSession(false)
+        .speak(output)
+        .getResponse();
+    }
+}
 
 /**
- * Starting point of application
- * Intent to Launch Skill.
- * Shows initial welcoming messages, in the default language of alexa and sets
- * the speaking language (native) to the default
+ * Custom Intent to handle the user request to select a new category
+ * Only triggered when given the command to set a category
  */
-const LaunchRequest = {
+const UserCategorySelectionIntent = {
     canHandle(handlerInput)
     {
-        const {request} = handlerInput.requestEnvelope;
-        return request.type === 'LaunchRequest'
-        || (request.type === 'IntentRequest' && request.intent.name === 'AMAZON.StartOverIntent');
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UserCategorySelectionIntent';
     },
     handle(handlerInput)
-    {
-        /* var keys= Object.keys(test_re);
-        var out ='t';
-        for (var i=0;i<keys.length ;i++)
-            out+= i+','+keys[i]+'.'; */
-        /* var keys = Object.keys(handlerInput)
-        return handlerInput.responseBuilder    
-            .withShouldEndSession(false)
-            .speak(out) //normal call.
-            .getResponse(); */
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+    {   
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let output = requestAttributes.t("WELCOME",requestAttributes.t("SKILL_NAME"),requestAttributes.t("INITIAL_LANGUAGE"))+retrieve_Strings("help",requestAttributes.t("INITIAL_LANGUAGE"),"launch");
-        Object.assign(sessionAttributes,
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+
+        //the value of query_response should be a category name
+        const query_response = slots['query'].value;
+        let category = sessionAttributes.category;
+        let output = "";
+        
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
+        {
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language is configured, safe to proceed
+            //getting all categories names in native and learning language
+            const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"all");
+            if (category_list != undefined)
             {
-                lastmsg: output,
-                helpmsg: "Launch",
-                voice: requestAttributes.t("NATIVE_VOICE"),
-                learning_language: "none",
-                native_language: requestAttributes.t("INITIAL_LANGUAGE_ENGLISH"),
-                native_name: requestAttributes.t("INITIAL_LANGUAGE"),
-                learning_name: "none",
-                break: 0,
-                rate: "100%",
-                volume: "medium",
-            });
+                const position = infoFound(query_response,category_list);
+                if (position != undefined)
+                {//category requested is found. update values
+                    category = category_list[position];
+                    //message for new category selection
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
+                    //message for subcategory list available
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    //get subcategory list.
+                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                    if (subcategory_list != undefined)
+                    {
+                        for (var i=0; i< subcategory_list.length; i++)
+                        {
+                            output += i==0 ? " " : ", ";
+                            output +=subcategory_list[i].replace(","," and")+" ";
+                        }
+                    }
+                    else
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                }
+                else
+                {//category name given was not valid/not found, assume given in different language
+                    output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                }
+            }
+            else
+            {//return message for content error
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+            }
+        }
+        //update values of session attributes      
+        Object.assign(sessionAttributes,
+        {
+            lastmsg: output,
+            helpmsg: "UserSelectionCategory",
+            category: category,
+            subcategory: undefined,
+            subcategory_ids: [], //reseting values of subcategory ids, new category
+            examples_ids: [], //reseting values of examples, new category
+            native_word: undefined,
+            native_phrase: undefined,
+            learning_word:undefined,
+            learning_phrase: undefined,
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
+        });
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         
-        output = switchVoice(output,handlerInput.attributesManager.getSessionAttributes());
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
+        return handlerInput.responseBuilder 
+        .withShouldEndSession(false)
+        .speak(output)
+        .getResponse();
+    }
+}
 
-        return handlerInput.responseBuilder    
-            .withShouldEndSession(false)
-            .speak(output) //normal call.
-            .getResponse();
+/**
+ * Custom Intent to handle the user request to select a new subcategory
+ * Only triggered when given the command to set a subcategory
+ */
+const UserSubcategorySelectionIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'UserSubcategorySelectionIntent';
     },
-};
+    handle(handlerInput)
+    {   
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+        
+        //value of query_response must be a subcategory name
+        const query_response = slots['query'].value;
+        let subcategory = sessionAttributes.subcategory;
+        let output = "";
+        let subcategory_ids = sessionAttributes.subcategory_ids == undefined ? [] : sessionAttributes.subcategory_ids;
+        // if learning language selected doesn't show anything here..
+        if (sessionAttributes.learning_language == "none")
+        {
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language is configured, safe to proceed
+            //check for category to be defined first
+            if (sessionAttributes.category)
+            {//category is set
+                const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");//getInfo2(requestAttributes,sessionAttributes,sessionAttributes.category,undefined,0));
+                if (subcategory_list != undefined)
+                {
+                    //id in list of native and learning subcategory names
+                    const id_temp = infoFound(query_response,subcategory_list);
+                    //setting the correct index for subcategory.
+                    const id = id_temp >= subcategory_list.length/2 ? (id_temp-subcategory_list.length/2) : id_temp;
+                    if (id!= undefined)
+                    {//subcategory requested is found. 
+                        subcategory = subcategory_list[id];
+                        subcategory_ids.push(id);
+                        //sorting the subcategory ids
+                        subcategory_ids.sort(sortIds);
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . ";
+                    }
+                    else
+                    {//category name given was not valid/not found, assume given in different language
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                        subcategory = undefined;
+                    }
+                }
+                else
+                {
+                    output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    subcategory = undefined;
+                }
+                
+            }
+            else
+            {
+                output+= retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
+                subcategory = undefined;
+            }
+        }
+        
+        //update values of session attributes      
+        Object.assign(sessionAttributes,
+        {
+            lastmsg: output,
+            helpmsg: subcategory != undefined ? "UserSelectionSubcategory" : "ShowCategories",
+            subcategory: subcategory,
+            subcategory_ids: subcategory_ids,
+            examples_ids: [], //new subcategory, reseting examples..
+            voice: retrieve_Strings("voices",sessionAttributes.native_language),
+            break: 0,
+        });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        
+        //setting appropriate voice for the return message.
+        output = switchVoice(output,sessionAttributes);
+        return handlerInput.responseBuilder 
+        .withShouldEndSession(false)
+        .speak(output)
+        .getResponse();
+    }
+}
+
+
 
 /**
  * Custom Intent that shows when requested the categories list or subcategories list
@@ -907,7 +1190,6 @@ const SelectCategoryIntent = {
         let random_sub = false;
         const examples_ids = []; 
         const subcategory_ids = [];
-        const category_ids = [];
         // if learning language selected doesn't show anything here..
         if (sessionAttributes.learning_language == "none")
         {
@@ -1098,6 +1380,200 @@ const SelectCategoryIntent = {
  * User can select to see next or random example.
  */
 const ExampleIntent = {
+    canHandle(handlerInput)
+    {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+          && handlerInput.requestEnvelope.request.intent.name === 'ExampleIntent';
+    },
+    handle(handlerInput)
+    {   
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+        const slots = handlerInput.requestEnvelope.request.intent.slots;
+        let resume = slots['continue'] != undefined ? slots['continue'].value : undefined;
+        let random = slots['random'] != undefined ? slots['random'].value : undefined;
+        let output="";
+        let category = sessionAttributes.category;
+        let subcategory = sessionAttributes.subcategory;
+        let examples_ids = sessionAttributes.examples_ids == undefined ? [] : sessionAttributes.examples_ids;
+        let subcategory_ids = sessionAttributes.subcategory_ids == undefined ? [] : sessionAttributes.subcategory_ids;
+        let override = true;
+        let new_example_entry;
+        let random_enabled;
+        let resume_enabled;
+        let keyword_check;
+        if (sessionAttributes.learning_language == "none")
+        {//learning language not configured
+            output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
+        }
+        else
+        {//learning language is set
+            if (category == undefined || subcategory == undefined)
+            {//both category and subcategory must be set before continuing with this
+                output += retrieve_Strings("warnings",sessionAttributes.native_language,"category")+retrieve_Strings("general",sessionAttributes.native_language,"suggested");
+                override = false;
+            }
+            else
+            {//safe to proceed further checks.
+                if (resume != undefined)
+                {//resume keyword triggered
+                    if (resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.native_language,"another").toUpperCase()
+                    || resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.learning_language,"another").toUpperCase()
+                    || resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.native_language,"next").toUpperCase()
+                    || resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.learning_language,"next").toUpperCase()
+                    || resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.native_language,"start").toUpperCase()
+                    || resume.toUpperCase() == checkEditor("continue_in_sub_list",sessionAttributes.learning_language,"start").toUpperCase())
+                    {//keyword given correctly
+                        keyword_check = true;
+                    }
+                    else
+                    {//keyword was given in a different language.              
+                        output += retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+                        keyword_check = false;  
+                    } 
+                }
+                if (random != undefined)
+                {//random keyword triggered
+                    if ((random.toUpperCase() == checkEditor("random_list",sessionAttributes.native_language,"random").toUpperCase()
+                    || random.toUpperCase() == checkEditor("random_list",sessionAttributes.learning_language,"random").toUpperCase()
+                    || random.toUpperCase() == checkEditor("random_list",sessionAttributes.native_language,"shuffle").toUpperCase()
+                    || random.toUpperCase() == checkEditor("random_list",sessionAttributes.learning_language,"shuffle").toUpperCase()))
+                    {
+                        keyword_check = true;
+                    }
+                    else
+                    {
+                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
+                        keyword_check = false;                      
+                    }
+                }
+                if (keyword_check)
+                {//keyword given in selected languages.
+                    //getting the current subcategory section
+                    const subcategory_section = [retrieveFromJson(sessionAttributes,category,subcategory)];//createReturnList("word",sessionAttributes,retrieveFromJson(sessionAttributes,category,subcategory),"all");
+                    //create an object that holds all info of the subcategory
+                    const subcategory_info = Object.assign({},{//value in each field will have the String value or "false" value -> doesn't exist for that example
+                        native_words: createReturnList("word",sessionAttributes,subcategory_section,"native",true)[0],
+                        learning_words: createReturnList("word",sessionAttributes,subcategory_section,"learning",true)[0],
+                        native_phrases: createReturnList("phrase",sessionAttributes,subcategory_section,"native",true)[0],
+                        learning_phrases: createReturnList("phrase",sessionAttributes,subcategory_section,"learning",true)[0]
+                    });
+                    Object.assign(sessionAttributes,subcategory_info);
+                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                    //need to check if at least the values of native and learning words exist
+                    if (subcategory_info.native_words == [] || subcategory_info.learning_words == [])
+                        output += retrieve_Strings("warnings",sessionAttributes.native_language,"empty_info");
+                    else
+                    {//further checks for example strings. subcategory info collected successfully
+                        if (subcategory_info.native_words.length > examples_ids.length)
+                        {//still some examples left -> do nothing, get next or next random example from function..
+                            output += "1:"+ retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                        }
+                        else
+                        {//all exmaples are done. change subcategory.
+                            output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_completed");
+                            //if covered all subcategories in current category.
+                            const category_subcategories = retrieveFromJson(sessionAttributes,sessionAttributes.category);
+                            if (subcategory_ids.length < category_subcategories.length)
+                            {//safe to change in current category
+                                let id;
+                                for (let k=0; k<subcategory_ids.length; k++)
+                                {
+                                    if (subcategory_ids[k] > k)
+                                    {//bigger subcategory id found. safe to select current 
+                                        id = k;
+                                        break;
+                                    }
+                                }
+                                if (id != undefined)
+                                {//valid subcategory id
+                                    output+= retrieve_Strings("general",sessionAttributes.native_language,"next_subcategory")+subcategory;
+                                    subcategory_ids.push(id);
+                                    subcategory_ids.sort(sortIds);
+                                    example_ids = [];
+                                    subcategory = createReturnList('title',sessionAttributes,category_subcategories,"native")[id];
+                                    output += "2"+retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . "+ retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                                }
+                                else
+                                {//id not found or not wrong with content
+                                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error")
+                                }
+                            }
+                            else
+                            {//need to change to new category
+                                //update values.
+                                subcategory_ids = [];
+                                examples_ids = [];
+                                //all categories names
+                                const categories_info = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
+                                //current category id
+                                const current_category_id = infoFound(category,categories_info);
+                                //check which category is next and update the category value
+                                category = (current_category_id == categories_info.length-1) ? categories_info[0] : categories_info[current_category_id+1];
+                                //updating value of new subcategory
+                                subcategory = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native")[0];
+                                //pushing to subcategory_ids the first sub_id.
+                                subcategory_ids.push(0);
+                                output += "3:"+retrieve_Strings("general",sessionAttributes.native_language,"subcategory_completed")+retrieve_Strings("general",sessionAttributes.native_language,"category_completed")+retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory+". "+retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                            }
+                        }
+                    }
+                    //categories/subcategories should be set here
+                    new_example_entry = getExample(handlerInput,subcategory_info,examples_ids,random);
+                    if (new_example_entry)
+                    {//example validation done. updating values
+                        Object.assign(sessionAttributes,new_example_entry);
+                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                    }
+                    
+                }
+            }
+            /* if (override == true)
+            {//changing examples while showing the word (both languages)
+                Object.assign(sessionAttributes,
+                    {
+                        voice: retrieve_Strings("voices",sessionAttributes.learning_language),
+                        break: 1,
+                        level: "strong",
+                    });
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                output = output+switchVoice(sessionAttributes.learning_word,sessionAttributes);
+                Object.assign(sessionAttributes,
+                    {
+                        voice: retrieve_Strings("voices",sessionAttributes.native_language),
+                        break: 1,
+                        level: "strong",
+                    });
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                output = output+" "+switchVoice(sessionAttributes.native_word,sessionAttributes);           
+            } */
+        }
+
+        Object.assign(sessionAttributes,
+            {
+                lastmsg: output,
+                subcategory: subcategory,
+                subcategory_ids: subcategory_ids,
+                helpmsg: "ExampleIntent",
+                break: 0,
+                rate: "100%",
+                volume: "medium",
+            });
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        output = switchVoice(output,sessionAttributes);
+
+        return handlerInput.responseBuilder
+        .withShouldEndSession(false)
+        .speak(output)
+        .getResponse();
+    },
+}
+/**
+ * Custom Intent to set the next Example for the user
+ * User can select to see next or random example.
+ */
+/* const ExampleIntent = {
     canHandle(handlerInput)
     {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -1330,7 +1806,7 @@ const ExampleIntent = {
             .getResponse();
 
     },
-};
+}; */
 
 /**
  * Custom Intent to show current example details.
@@ -1470,277 +1946,6 @@ const DetailsIntent = {
     },
 };
 
-/**
- * Custom Intent to show currrent category, subcategory, example, native and learning languages.
- */
-const IndexIntent = {
-    canHandle(handlerInput)
-    {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'IndexIntent';
-    },
-    handle(handlerInput)
-    {
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-
-        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const slots = handlerInput.requestEnvelope.request.intent.slots;
-        
-        const request = slots['request'].value;
-        let output ="";
-        if (sessionAttributes.category != undefined && 
-            request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_category").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_category").toUpperCase() )
-        {//current category
-           output = request+" . "+sessionAttributes.category;
-        }
-        else if (sessionAttributes.subcategory != undefined && 
-            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_subcategory").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_subcategory").toUpperCase()))
-        {//current subcategory
-            output = request+" . "+sessionAttributes.subcategory;
-        }
-        else if (sessionAttributes.examples_ids != undefined && 
-            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_example").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_example").toUpperCase()))
-        {//current example
-            if (sessionAttributes.examples_ids.length>0)
-                output = request+" .  "+sessionAttributes.native_word;
-            else
-                output = retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
-        }
-        else if (sessionAttributes.learning_language != undefined && 
-            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"learning_language").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"learning_language").toUpperCase()))
-        {//current learning language
-            output = request + " .  "+sessionAttributes.learning_name;
-        }
-        else if (sessionAttributes.native_language != undefined && 
-            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"native_language").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"native_language").toUpperCase()
-            ||request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"mother_language").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"mother_language").toUpperCase()))
-        {//current native language
-            output = request + " .  "+sessionAttributes.native_name;
-        }
-        else if (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"language_list").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"language_list").toUpperCase())
-        {//show language list
-            output = retrieve_Strings("language",sessionAttributes.native_language,"list");
-        }
-        else if (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"category_list").toUpperCase()
-        || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"category_list").toUpperCase())
-        {//show category list
-            let info = getInfo(requestAttributes,sessionAttributes,undefined,undefined,0,false);
-            output+= retrieve_Strings("general",sessionAttributes.native_language,"category_list")+". ";
-            for (let i=0;i<info.length; i++)
-            {
-                output+=", "+languageProvider(sessionAttributes.native_language,info[i],"category");
-            }
-        }
-        else //something was wrong in the selection of the user. information not available
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
-
-        Object.assign(sessionAttributes,
-            {
-                lastmsg: output,
-                helpmsg: "IndexIntent",
-                voice: retrieve_Strings("voices",sessionAttributes.native_language),
-                break: 0,
-                rate: "100%",
-                volume: "medium",
-            });
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        
-        
-        output = switchVoice(output,sessionAttributes);
-        return handlerInput.responseBuilder 
-            .withShouldEndSession(false)
-            .speak(output)
-            .getResponse();
-    },
-};
-
-/**
- * Custom Intent to change Native or Learning language
- */
-const LanguageSelectionIntent = {
-    canHandle(handlerInput)
-    {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-          && handlerInput.requestEnvelope.request.intent.name === 'LanguageSelectionIntent';
-    },
-    handle(handlerInput)
-    {
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-
-        let sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const slots = handlerInput.requestEnvelope.request.intent.slots;
-        const language = slots['language'].value;
-        const type = slots['language_type'].value;
-        let output = "";
-        let native=sessionAttributes.native_language;
-        let learning= sessionAttributes.learning_language;
-        let native_name=sessionAttributes.native_name
-        let learning_name=sessionAttributes.learning_name;
-        let reset = false;
-        let category = sessionAttributes.category;
-        let subcategory = sessionAttributes.subcategory;
-
-        let language_request_english = returnSpokenLanguage(language); //language that the request was given. (in english)
-        
-       
-        
-        if (language_request_english == "unidentified" || language_request_english == undefined 
-            || language_request_english.toUpperCase() != native.toUpperCase()) 
-        {
-            output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request")+retrieve_Strings("warnings",sessionAttributes.native_language,"given_request")+retrieve_Strings("translation",sessionAttributes.native_language,language_request_english)+". ";
-        }
-        else
-        {
-            if (language != undefined && type !=undefined)
-            {
-                if (type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"native").toUpperCase()
-                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"native").toUpperCase()
-                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"mother").toUpperCase()
-                || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"mother").toUpperCase())
-                {
-                    if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"native_warn")+language+". ";
-                    else if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                        output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection");
-                    else
-                    {
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"native_selection")+language+". ";
-                        native_name = language;
-                        native = retrieve_Strings("translation",language,"return");
-                        if (category != undefined)
-                        {
-                            let new_cat;
-
-                            //to get previous category info.. and change the category name..
-                            let info = getInfo(requestAttributes,sessionAttributes,category,undefined,0);
-                            new_cat = languageProvider(native,info,"category");
-                            if (subcategory != undefined)
-                            {
-                                // get previous subcategory info to change name..
-                                info = getInfo(requestAttributes,sessionAttributes,category,subcategory,0);
-                                subcategory = languageProvider(native,info,"title");
-                            }
-                            category = new_cat;
-                        }
-                    }
-                }
-                else if  (type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"teaching").toUpperCase()
-                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"teaching").toUpperCase()
-                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"second").toUpperCase()
-                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"second").toUpperCase()
-                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.native_language,"learning").toUpperCase()
-                    || type.toUpperCase() == checkEditor("language_type",sessionAttributes.learning_language,"learning").toUpperCase())
-                {   //request to change learning language
-                    
-                    if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_warn")+language+". ";//same selection as before
-                    else if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                        output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //both languages are the same
-                    else
-                    {//correct selection
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
-                        learning_name = language;
-                        learning = retrieve_Strings("translation",language,"return");
-                        reset = true;
-                    }
-                }
-                else
-                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
-            }
-            else if (type == undefined && language!= undefined)
-            {//learn "language", set learning language to this
-                // check if learning language is the same as before..
-                if (learning.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                    output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_warn")+language+". ";
-                else if (native.toUpperCase() == returnSpokenLanguage(retrieve_Strings("translation",language,native)).toUpperCase())
-                    output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //if same selection for both languages
-                else
-                {
-                    output =  retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
-                    learning_name = language;
-                    learning = retrieve_Strings("translation",language,"return");
-                    reset = true;
-                }
-                //changes learning language only.
-            }
-            else//something wasn't given correctly
-                output= retrieve_Strings("warnings",sessionAttributes.native_language,"missing_info");
-        }
-
-        Object.assign(sessionAttributes,
-            {
-                native_language: native,
-                learning_language: learning,
-                native_name: native_name,
-                learning_name: learning_name,
-                lastmsg: output,
-                helpmsg: "LanguageSelection",
-                voice: retrieve_Strings("voices",native),
-                break: 0,
-                rate: "100%",
-                volume: "medium",
-                reset: reset,
-                category: category,
-                subcategory: subcategory,
-            });
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-        //if learning language change then all categories are changed.. (different info)
-        // so must reset all category and subcategory selections and reset the examples.
-        if (reset == true)
-        {
-            Object.assign(sessionAttributes,
-            {
-                category: undefined,
-                subcategory: undefined,
-            });
-            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-            output+= retrieve_Strings("warnings",sessionAttributes.native_language,"reset");
-        }
-
-        output = switchVoice(output+retrieve_Strings("language",native,"selection")+sessionAttributes.learning_name,sessionAttributes);
-        return handlerInput.responseBuilder 
-            .withShouldEndSession(false)
-            .speak(output)
-            .getResponse(); 
-    }
-} ;
-
-//INTENTS declarations
-
-const skillBuilder = Alexa.SkillBuilders.custom();
-exports.handler = skillBuilder
-  .addRequestHandlers(
-    LaunchRequest,
-    ExampleIntent,
-    SessionEndedRequest,
-    HelpIntent,
-    CancelAndStopIntentHandler,
-    FallbackHandler,
-    UserSelectionIntent,
-    UserCategorySelectionIntent,
-    UserSubcategorySelectionIntent,
-    ShowCategoriesIntent,
-    //ShowCategories,
-    RepeatMessageIntent,
-    //SelectCategoryIntent,
-    DetailsIntent,
-    IndexIntent,
-    LanguageSelectionIntent,
-  ) 
-  .addRequestInterceptors(LocalizationInterceptor)
-  .addErrorHandlers(ErrorHandler)
-  .lambda();
-
-
-
 // USER DEFINED FUNCTIONS
 
 /**
@@ -1782,6 +1987,25 @@ function retrieveFromJson(sessionAttributes,category = undefined,subcategory = u
             }
         return undefined;
     }
+    else if (category != undefined && subcategory != undefined)
+    {
+        let test_out="";
+        //section of category containing all subcategories
+        const category_sections = retrieveFromJson(sessionAttributes,category);
+        
+        for (var k=0; k<category_sections.length; k++)
+        {//find correct subcategory section
+            if ( removeSSML(languageProvider(sessionAttributes.learning_language,category_sections[k],"title")).toUpperCase()== subcategory.toUpperCase() 
+                || removeSSML(languageProvider(sessionAttributes.native_language,category_sections[k],"title")).toUpperCase()== subcategory.toUpperCase())
+            {//found clean subcategory name
+                return category_sections[k];
+            }
+            else
+                test_out+= 'nope for '+k;//'not found for'+removeSSML(languageProvider(sessionAttributes.learning_language,category_sections[k],"title")).toUpperCase()+"or"+languageProvider(sessionAttributes.native_language,category_sections[k],"title").toUpperCase();
+                
+        }
+        return "here:"+test_out;
+    }
     return undefined;
 }
 
@@ -1801,7 +2025,9 @@ function infoFound(query_response, category_list)
     for (var i=0; i<category_list.length/2; i++)
     {
         if (category_list[i].toUpperCase() == query_response.toUpperCase()
-            || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase())
+            || category_list[i].toUpperCase() == query_response.replace(" and",",").toUpperCase()
+            || category_list[category_list.length/2+i].toUpperCase() == query_response.toUpperCase()
+            || category_list[category_list.length/2+i].toUpperCase() == query_response.replace(" and",",").toUpperCase())
             return category_list[i].toUpperCase() == query_response.toUpperCase() ? i : category_list.length/2+i;
     }
     return undefined;
@@ -1820,7 +2046,7 @@ function infoFound(query_response, category_list)
  * 
  * @return the list of categories/subcategories or undefined if content error
  */
-function createReturnList(option,sessionAttributes,section_info,return_option)
+function createReturnList(option,sessionAttributes,section_info,return_option,tags = false)
 {
     //2 languages to check in the categories info list.
     const learning_language = sessionAttributes.learning_language;
@@ -1837,14 +2063,16 @@ function createReturnList(option,sessionAttributes,section_info,return_option)
             {
                 const learning_title = languageProvider(learning_language,section_info[i],option);
                 const native_title = languageProvider(native_language,section_info[i],option);
-                if (native_title)//adding to native array
+                if (tags)
                 {
-                    native_list[i]=removeSSML(native_title);
+                    native_list[i]= native_title == undefined ? "false" : native_title;
+                    learning_list[i]= learning_title == undefined ? "false" : learning_title;
                 }
-                if (learning_title)//adding to native array
+                else
                 {
-                    learning_list[i]=removeSSML(learning_title);
-                }    
+                    native_list[i]= removeSSML(native_title) == "false" ? "false" : removeSSML(native_title);
+                    learning_list[i]= removeSSML(learning_title) == "false" ? "false" : removeSSML(learning_title);
+                }  
             }
             if (return_option == "all")
                 return native_list.concat(learning_list);
@@ -1869,6 +2097,8 @@ function createReturnList(option,sessionAttributes,section_info,return_option)
  */
 function removeSSML(ssmltext)
 {
+    if (ssmltext == undefined)
+        return "false";
     //index variable to remove the ssml tags from the values
     var index = ssmltext.indexOf('<');
     let tag;
@@ -1883,81 +2113,106 @@ function removeSSML(ssmltext)
 }
 
 /**
- * Given the information it sets the next example for the subcategory selected
- * @param {*} handlerInput 
+ * @description Finds and returns a new example
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {Object} handlerInput 
  * @param {*} subcategory_info 
  * @param {*} random : wheather to set a random or next example
  */
-function setExample(handlerInput,subcategory_info,random)
+function getExample(handlerInput,subcategory_info,examples_ids,random)
 {
     
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    //const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     
     //return getSubcategory(handlerInput,category,sub);
-    
-    //debuging
-    Object.assign(sessionAttributes,
-        {
-            debug:"in setExample before getSubcategory",
-        });
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-    let rnd_example;
-    let exit="false";
-    let examples_shown=[];
-    let debug;
+    let example_id;
     //To find the examples not shown yet.
     if (random == true)
-    {
-        if (sessionAttributes.examples_ids !=undefined && sessionAttributes.examples_ids.length>0 && sessionAttributes.examples_ids.length < languageProvider(sessionAttributes.native_language,subcategory_info,"word").length)
-        {    
-            do
-            {
-                rnd_example = Math.floor(Math.random()*languageProvider(sessionAttributes.native_language,subcategory_info,"word").length);
-                
-                for (let i=0;i<sessionAttributes.examples_ids.length;i++)
+    {//random example is enabled here
+        //assuming all checks for changing category/subcategory are done before
+        //check if empty example list. first time adding an example.
+        if (examples_ids.length == 0)
+        {//first example of a new category
+            example_id = Math.floor(Math.random()*subcategory_info.length);
+        }
+        else
+        {//example list already has an example
+            let while_ = true;
+            while(while_)
+            {//loop until new example found. 
+                //create a random id.
+                example_id = Math.floor(Math.random()*subcategory_info.length);
+                for(let i=0; i<examples_ids.length; i++)
                 {
-                    if (sessionAttributes.examples_ids[i] == rnd_example)
-                    {
-                        exit="false";
+                    if (examples_ids[i] == example_id)
+                    {//example id exists
                         break;
                     }
-                    else
-                        exit="true";
+                    else if (examples_ids[i] > example_id)
+                    {//bigger example id found. example_id is valid
+                        while_ = false;
+                        break;
+                    }
                 }
-
-            } while (exit=="false");
-            examples_shown = sessionAttributes.examples_ids;
-            examples_shown.push(rnd_example);
-            debug = "after do while: "+examples_shown.length;
-        }
-        else if (sessionAttributes.examples_ids == undefined || sessionAttributes.examples_ids.length==0)
-        {
-            rnd_example = Math.floor(Math.random()*languageProvider(sessionAttributes.native_language,subcategory_info,"word").length);
-            examples_shown.push(rnd_example);
+            }
         }
     }
     else
     {//just the next.. (all checks for end of subcategory is done before this.)
-        examples_shown = sessionAttributes.examples_ids;
+        if (examples_ids.length == 0)
+        {//first example of a new category
+            example_id = 0;
+        }
+        else
+        {//find next available example
+            for(let i=0; i<examples_ids.length; i++)
+            {//loop through all examples ids.
+                if (examples_ids[i] > i) 
+                {//sorted list
+                    example_id = i;
+                    break;
+                }
+            }
+            //examples were done in sequence add the very next
+            if (example_id == undefined)
+                example_id = examples_ids.length;
+        }
+        
+            /* 
+        example_id != undefined ? examples_ids.push(example_id) ;
+        examples_shown = examples_ids;
         if (examples_shown.length == 0)
             examples_shown.push(0);//first example..
         else
-            examples_shown.push(examples_shown[examples_shown.length-1]+1);//next index..
+            examples_shown.push(examples_shown[examples_shown.length-1]+1);//next index.. */
     }
-    
+    if (example_id != undefined)
+    {//id of next example is set
+        examples_ids.push(example_id);
+        return Object.assign({},
+        {
+            native_word: subcategory_info.native_words[example_id],
+            learning_word: subcategory_info.learning_words[example_id],
+            native_phrase: subcategory_info.native_phrases[example_id],
+            learning_phrase: subcategory_info.learning_phrases[example_id],
+            examples_ids: examples_ids.sort(sortIds),
+            test: example_id,
+        });
+    }
+    else 
+        return false;/* 
     Object.assign(sessionAttributes,
         {
-            native_word: languageProvider(sessionAttributes.native_language,subcategory_info,"word")[examples_shown[examples_shown.length-1]],
-            learning_word: languageProvider(sessionAttributes.learning_language,subcategory_info,"word")[examples_shown[examples_shown.length-1]],
-            native_phrase: languageProvider(sessionAttributes.native_language,subcategory_info,"phrase")[examples_shown[examples_shown.length-1]],
-            learning_phrase: languageProvider(sessionAttributes.learning_language,subcategory_info,"phrase")[examples_shown[examples_shown.length-1]],
-            examples_ids: examples_shown,
-            debug2: debug,
+            native_word: subcategory_info.native_words[examples_shown[examples_shown.length-1]] != undefined ? subcategory_info.native_words[examples_shown[examples_shown.length-1]] : "false",//languageProvider(sessionAttributes.native_language,subcategory_info,"word")[examples_shown[examples_shown.length-1]],
+            learning_word: subcategory_info.learning_words[examples_shown[examples_shown.length-1]] != undefined ? subcategory_info.learning_words[examples_shown[examples_shown.length-1]] : "false", //languageProvider(sessionAttributes.learning_language,subcategory_info,"word")[examples_shown[examples_shown.length-1]],
+            native_phrase: subcategory_info.native_phrases[examples_shown[examples_shown.length-1]] != undefined ? subcategory_info.native_phrases[examples_shown[examples_shown.length-1]] : "false",//languageProvider(sessionAttributes.native_language,subcategory_info,"phrase")[examples_shown[examples_shown.length-1]],
+            learning_phrase:subcategory_info.learning_phrases[examples_shown[examples_shown.length-1]] != undefined ? subcategory_info.learning_phrases[examples_shown[examples_shown.length-1]] : "false", //languageProvider(sessionAttributes.learning_language,subcategory_info,"phrase")[examples_shown[examples_shown.length-1]],
+            examples_ids: examples_shown.sort(sortIds),
         });
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    
-    
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes); */
 }
 
 /**
@@ -2033,10 +2288,17 @@ function getInfo(requestAttributes,sessionAttributes,category,subcategory,move)
     else if (category == undefined && subcategory == undefined)
         return categories_info;
 }
+
 /**
- * This function takes a given string and sets the volume, rate and voice presented.
- * @param {} text : text given to show
- * @param {*} sessionAttributes  
+ * @description Returns the text given with ssml tags for modifiation in the return message of Alexa
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {Strings} text : text given to modify before returing
+ * @param {Object} sessionAttributes  Object that contains the session attributes of the user
+ * 
+ * @return String Spoken message for Alexa with ssml tags for customization.
  */
 function switchVoice(text,sessionAttributes) {
     if (text){
@@ -2044,11 +2306,18 @@ function switchVoice(text,sessionAttributes) {
     }
   }
 
-  /**
-   * Given the language and the info parameter, this function returns the appropriate information from the content file
-   * @param {*} info language content
-   * @param {*} option category | subcategory | example | word | phrase
-   */
+/**
+ * @description Returns the selected value from the content file, given a specific key and language option 
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {String} language language that the value will be returned
+ * @param {Object} info Object that holds all the info for the current section
+ * @param {String} option category | subcategory | example | word | phrase: which part of the section to return
+ * 
+ * @return Value requested or false if not found.
+ */
 function languageProvider(language,info,option)
 {
     if (option == "category")
@@ -2131,13 +2400,37 @@ function languageProvider(language,info,option)
                 return info.italian_phrase;
         }
     }
+
+    return "false";
 }
 
 /**
- * Given the language and the keyword, this function checks that the keyword is given in the correct language (native or learning)
- * @param {*} keyword_category  the category of the keyword for all languages.
- * @param {*} language 
- * @param {*} type  type of keyword..
+ * @description Takes as parameter 2 numbers and sorts them in a list of ids
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {Integer} id_1 First id to sort
+ * @param {Integer} id_2 Second id to sort
+ * 
+ * @return Sorted list of ids
+ */
+function sortIds(id_1, id_2)
+{
+    return id_1-id_2;
+}
+
+/**
+ * @description Responsible to check if given keyword is in correct language.
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {String} keyword_category  the category of the keyword for all languages.
+ * @param {String} language Language to check with
+ * @param {String} type  type of keyword.
+ * 
+ * @return Requested keyword or false if not found
  */
 function checkEditor(keyword_category,language,type)
 {
@@ -2362,12 +2655,18 @@ function checkEditor(keyword_category,language,type)
             }
         }
     }
-    return "null";
+    return "false";
 }
 
 /**
- * Returns the language of the request.
- * @param {} language 
+ * @description Finds and returns the language's name in the requested language
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {String} language Language to return the native name
+ * 
+ * @return Native name of language or undefined if not found
  */
 function returnSpokenLanguage(language)
 {
@@ -2393,8 +2692,16 @@ function returnSpokenLanguage(language)
 }
 
 /**
- * goes in language_strings content files and retrieves appropriate message string to show to user.
+ * @description Returns a requested message that Alexa will display next
  * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {String} string_category Category of string to search for
+ * @param {String} language Language that the string was requested in
+ * @param {String} type Type of message to return.
+ * 
+ * @return Requested string to show or false if not found
  */
 function retrieve_Strings(string_category,language,type)
 {
@@ -2540,6 +2847,10 @@ function retrieve_Strings(string_category,language,type)
                             return retriever[i].name_not_found;
                         case "not_category":
                             return retriever[i].not_category;
+                        case "empty_info":
+                            return retriever[i].empty_info;
+                        case "cancel_stop":
+                            return retriever[i].cancel_stop;
                     }
                 }
             }
@@ -2593,6 +2904,32 @@ function retrieve_Strings(string_category,language,type)
             }
         } 
         default:
-            return "nada";    
+            return "false";    
     }
 }
+
+
+ /** All Intents declarations */
+ const skillBuilder = Alexa.SkillBuilders.custom();
+ exports.handler = skillBuilder
+   .addRequestHandlers(
+     LaunchRequest,
+     ExampleIntent,
+     SessionEndedRequest,
+     HelpIntent,
+     CancelAndStopIntentHandler,
+     FallbackHandler,
+     UserSelectionIntent,
+     UserCategorySelectionIntent,
+     UserSubcategorySelectionIntent,
+     ShowCategoriesIntent,
+     //ShowCategories,
+     RepeatMessageIntent,
+     //SelectCategoryIntent,
+     DetailsIntent,
+     IndexIntent,
+     LanguageSelectionIntent,
+   ) 
+   .addRequestInterceptors(LocalizationInterceptor)
+   .addErrorHandlers(ErrorHandler)
+   .lambda();
