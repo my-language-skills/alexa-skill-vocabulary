@@ -19,11 +19,11 @@ module.exports = {
             },
             {
                 language: "italian",
-                voice: "Giorgio",
+                voice: "Carla",
             },
             {
                 language: "spanish",
-                voice: "Conchita",
+                voice: "Lucia",
             }
         ],
         GENERAL_STRINGS:
@@ -35,7 +35,7 @@ module.exports = {
                 category_list: "The following list is an index of all categories available ",
                 subcategory_list: "The following list is an index of all subcategories of category  ",
                 new_category: "Category selected: ",
-                new_subcategory: "Subcaregory selected: ",
+                new_subcategory: "subcategory selected: ",
                 fallback: "Something was given wrong, please follow the instructions. See you later. ",
                 category_completed: "All subcategories are completed. ",
                 subcategory_completed: "All examples of current subcategory are completed. ",
@@ -49,7 +49,7 @@ module.exports = {
                 category_list: "The following list is an index of all categories available ",
                 subcategory_list: "The following list is an index of all subcategories of category  ",
                 new_category: "Category selected: ",
-                new_subcategory: "Subcaregory selected: ",
+                new_subcategory: "subcategory selected: ",
                 fallback: "Something was given wrong, please follow the instructions. See you later. ",
                 category_completed: "All subcategories are completed. ",
                 subcategory_completed: "All examples of current subcategory are completed. ",
@@ -63,7 +63,7 @@ module.exports = {
                 category_list: "The following list is an index of all categories available ",
                 subcategory_list: "The following list is an index of all subcategories of category  ",
                 new_category: "Category selected: ",
-                new_subcategory: "Subcaregory selected: ",
+                new_subcategory: "subcategory selected: ",
                 fallback: "Something was given wrong, please follow the instructions. See you later. ",
                 category_completed: "All subcategories are completed. ",
                 subcategory_completed: "All examples of current subcategory are completed. ",
@@ -77,7 +77,7 @@ module.exports = {
                 category_list: "The following list is an index of all categories available ",
                 subcategory_list: "The following list is an index of all subcategories of category  ",
                 new_category: "Category selected: ",
-                new_subcategory: "Subcaregory selected: ",
+                new_subcategory: "subcategory selected: ",
                 fallback: "Something was given wrong, please follow the instructions. See you later. ",
                 category_completed: "All subcategories are completed. ",
                 subcategory_completed: "All examples of current subcategory are completed. ",
@@ -229,6 +229,9 @@ module.exports = {
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
+                empty_info: "Subcategory selected is empty. ",
+                cancel_stop: "Thank you for using Lexicon, see you around. ",
+                
             },
             {
                 language:"french",
@@ -247,6 +250,8 @@ module.exports = {
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
+                empty_info: "Subcategory selected is empty. ",
+                cancel_stop: "Thank you for using Lexicon, see you around. ",
             },
             {
                 language:"german",
@@ -265,6 +270,8 @@ module.exports = {
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
+                empty_info: "Subcategory selected is empty. ",
+                cancel_stop: "Thank you for using Lexicon, see you around. ",
             },
             {
                 language:"italian",
@@ -283,6 +290,8 @@ module.exports = {
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
+                empty_info: "Subcategory selected is empty. ",
+                cancel_stop: "Thank you for using Lexicon, see you around. ",
             },
             {
                 language:"spanish",
@@ -301,6 +310,8 @@ module.exports = {
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
+                empty_info: "Subcategory selected is empty. ",
+                cancel_stop: "Thank you for using Lexicon, see you around. ",
             }
         ],
         LANGUAGE_STRINGS:

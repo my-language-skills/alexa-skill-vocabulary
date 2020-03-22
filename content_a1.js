@@ -89,11 +89,11 @@ module.exports =
 				italian_sub:	['<lang xml:lang="it-IT">Riflessione, conoscenza</lang>','<lang xml:lang="it-IT">Espressione verbale</lang>',],
             },
             {
-				english_title:	'<lang xml:lang="en-US">INDIVIDUAL: PHYSICAL ASPECTS</lang>',
-				spanish_title:	'<lang xml:lang="es-ES">INDIVIDUO: DIMENSIÓN FÍSICA</lang>',
+				english_title:	'<lang xml:lang="en-US">INDIVIDUAL PHYSICAL ASPECTS</lang>',
+				spanish_title:	'<lang xml:lang="es-ES">INDIVIDUO DIMENSIÓN FÍSICA</lang>',
 				german_title:	'<lang xml:lang="de-DE"></lang>',
 				french_title:	'<lang xml:lang="fr-FR"></lang>',
-				italian_title:	'<lang xml:lang="it-IT">INDIVIDUO: DIMENSIONE FISICA</lang>',
+				italian_title:	'<lang xml:lang="it-IT">INDIVIDUO DIMENSIONE FISICA</lang>',
 				english_sub:	['<lang xml:lang="en-US">Parts of the body</lang>','<lang xml:lang="en-US">Physical characteristics</lang>','<lang xml:lang="en-US">Actions and positions carried out with the body</lang>','<lang xml:lang="en-US">Life cycle and reproduction</lang>',],
 				spanish_sub:	['<lang xml:lang="es-ES">Partes del cuerpo</lang>','<lang xml:lang="es-ES">Características físicas</lang>','<lang xml:lang="es-ES">Acciones y posiciones que se realizan con el cuerpo</lang>','<lang xml:lang="es-ES">Ciclo de vida y reproducción</lang>',],
 				german_sub:	['<lang xml:lang="de-DE">Körperteile</lang>','<lang xml:lang="de-DE"></lang>','<lang xml:lang="de-DE"></lang>','<lang xml:lang="de-DE"></lang>',],
@@ -186,7 +186,7 @@ module.exports =
 			},
 			{
 				english_title:	'<lang xml:lang="en-US">INFORMATION AND MEANS OF COMMUNICATION</lang>',
-				spanish_title:	'<lang xml:lang="es-ES">"INFORMACIÓN Y MEDIOS DE COMUNICACIÓN"</lang>',
+				spanish_title:	'<lang xml:lang="es-ES">INFORMACIÓN Y MEDIOS DE COMUNICACIÓN</lang>',
 				german_title:	'<lang xml:lang="de-DE">Information und Kommunikationsmittel</lang>',
 				french_title:	'<lang xml:lang="fr-FR"></lang>',
 				italian_title:	'<lang xml:lang="it-IT">INFORMAZIONE E MEZZI DI COMUNICAZIONE</lang>',
@@ -222,7 +222,7 @@ module.exports =
 			},
 			{
 				english_title:	'<lang xml:lang="en-US">SHOPPING SHOPS AND ESTABLISHMENTS</lang>',
-				spanish_title:	'<lang xml:lang="es-ES">"COMPRAS TIENDAS Y ESTABLECIMIENTOS"</lang>',
+				spanish_title:	'<lang xml:lang="es-ES">COMPRAS TIENDAS Y ESTABLECIMIENTOS</lang>',
 				german_title:	'<lang xml:lang="de-DE"></lang>',
 				french_title:	'<lang xml:lang="fr-FR"></lang>',
 				italian_title:	'<lang xml:lang="it-IT">COMPERE NEGOZI E COMMERCI</lang>',
@@ -3484,9 +3484,6 @@ module.exports =
 			},
 		],
 		TRIPS:
-		[
-		],
-		Trips:
 		[
 			{
 				english_title:	'<lang xml:lang="en-US">objects and documents relating to trips</lang>',
