@@ -137,7 +137,7 @@ const ErrorHandler = {
     
       const sessionAttributes = handlerInput.attributesManager.getSessionAttributes(); 
       return handlerInput.responseBuilder
-        .speak("Run-Time Error: "+error.message)
+        .speak("Run-Time Error: "+error.message+". DEBUG:"+sessionAttributes.debug)
         .getResponse();
     },
 };
@@ -779,6 +779,10 @@ const UserSelectionIntent = {
         /* Const values for slots*/
         const option = slots['option_selection'].value;
 
+        
+        //subcategory length.
+        let sub_length = sessionAttributes.subcategories_length != undefined ? sessionAttributes.subcategories_length : 0;
+        let examples_length = sessionAttributes.examples_length != undefined ? sessionAttributes.examples_length : 0;
         let category = sessionAttributes.category;
         let subcategory = sessionAttributes.subcategory;
         let subcategory_ids = sessionAttributes.subcategory_ids ? sessionAttributes.subcategory_ids : [];
@@ -808,7 +812,10 @@ const UserSelectionIntent = {
                     output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
                     //get subcategory list.
                     const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    
+                    //updating value of subcategories length
+                    sub_length = subcategory_list.length;
+                    //reseting the length of the examples. no subcategory set at this point.
+                    examples_length = 0;
                     if (subcategory_list != undefined)
                     {
                         for (var i=0; i< subcategory_list.length; i++)
@@ -833,7 +840,23 @@ const UserSelectionIntent = {
                     {
                         const id = Math.floor(Math.random()*subcategory_list.length); //to set for array position
                         subcategory = subcategory_list[id];
-                        subcategory_ids.push(id);
+
+                        examples_length = createReturnList("word",sessionAttributes,[retrieveFromJson(sessionAttributes,category,subcategory)],"native",true)[0].length;
+                        let exists=false;
+                        //check if subcaregory already exists. don't add again.
+                        for (let i=0; i<subcategory_ids.length; i++)
+                        {
+                            if (subcategory_ids[i]==id)
+                            {
+                                exists = true;
+                                break;
+                            }
+                            else
+                                exists = false;
+                        }
+                        //add the subcategory id to the list if it wasn't added before
+                        if (exists == false)
+                            subcategory_ids.push(id);
                         //sorting the subcategory ids
                         subcategory_ids.sort(sortIds);
                         //message for new category selection
@@ -856,7 +879,9 @@ const UserSelectionIntent = {
             category: category,
             subcategory: subcategory, //changing category, means reseting the subcategory name
             subcategory_ids: subcategory_ids, //if category is changed then the subcategory_ids will be reset
+            subcategories_length: sub_length != undefined ? sub_length : 0,//maximum number of category's subcategories
             examples_ids: [], //changing category or subcategory => reset the examples
+            examples_length: examples_length,//length of current subcategory's examples
             voice: retrieve_Strings("voices",sessionAttributes.native_language),
             break: 0,
         });
@@ -889,8 +914,13 @@ const UserCategorySelectionIntent = {
         //the value of query_response should be a category name
         const query_response = slots['query'].value;
         let category = sessionAttributes.category;
+        let subcategory = sessionAttributes.subcategory;
         let output = "";
         
+        //subcategory length.
+        let sub_length = sessionAttributes.subcategories_length != undefined ? sessionAttributes.subcategories_length : 0;
+        //examples length
+        let examples_length = sessionAttributes.examples_length != undefined ? sessionAttributes.examples_length : 0;
         // if learning language selected doesn't show anything here..
         if (sessionAttributes.learning_language == "none")
         {
@@ -906,6 +936,12 @@ const UserCategorySelectionIntent = {
                 if (position != undefined)
                 {//category requested is found. update values
                     category = category_list[position];
+                    //updating subcategory value
+                    subcategory = undefined;
+                    //updating examples length value
+                    examples_length = 0;
+                    //updating subcategories length value
+                    sub_length = subcategory_list.length;
                     //message for new category selection
                     output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
                     //message for subcategory list available
@@ -939,9 +975,11 @@ const UserCategorySelectionIntent = {
             lastmsg: output,
             helpmsg: "UserSelectionCategory",
             category: category,
-            subcategory: undefined,
+            subcategory: subcategory,
             subcategory_ids: [], //reseting values of subcategory ids, new category
-            examples_ids: [], //reseting values of examples, new category
+            subcategories_length: sub_length,//maximum number of category's subcategories
+            examples_ids: [], //reseting values of examples, new category,
+            examples_length: examples_length, // length of examples of subcategory
             native_word: undefined,
             native_phrase: undefined,
             learning_word:undefined,
@@ -980,6 +1018,7 @@ const UserSubcategorySelectionIntent = {
         let subcategory = sessionAttributes.subcategory;
         let output = "";
         let subcategory_ids = sessionAttributes.subcategory_ids == undefined ? [] : sessionAttributes.subcategory_ids;
+        let examples_length = sessionAttributes.examples_length != undefined ? sessionAttributes.examples_length : 0;
         // if learning language selected doesn't show anything here..
         if (sessionAttributes.learning_language == "none")
         {
@@ -1000,7 +1039,23 @@ const UserSubcategorySelectionIntent = {
                     if (id!= undefined)
                     {//subcategory requested is found. 
                         subcategory = subcategory_list[id];
-                        subcategory_ids.push(id);
+                        //setting examples length
+                        examples_length = createReturnList("word",sessionAttributes,[retrieveFromJson(sessionAttributes,category,subcategory)],"native",true)[0].length;
+                        let exists=false;
+                        //check if subcaregory already exists. don't add again.
+                        for (let i=0; i<subcategory_ids.length; i++)
+                        {
+                            if (subcategory_ids[i]==id)
+                            {
+                                exists = true;
+                                break;
+                            }
+                            else
+                                exists = false;
+                        }
+                        //add the subcategory id to the list if it wasn't added before
+                        if (exists == false)
+                            subcategory_ids.push(id);
                         //sorting the subcategory ids
                         subcategory_ids.sort(sortIds);
                         //message for new category selection
@@ -1009,20 +1064,17 @@ const UserSubcategorySelectionIntent = {
                     else
                     {//category name given was not valid/not found, assume given in different language
                         output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
-                        subcategory = undefined;
                     }
                 }
                 else
                 {
                     output+= retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
-                    subcategory = undefined;
                 }
                 
             }
             else
             {
                 output+= retrieve_Strings("warnings",sessionAttributes.native_language,"not_category");
-                subcategory = undefined;
             }
         }
         
@@ -1034,6 +1086,7 @@ const UserSubcategorySelectionIntent = {
             subcategory: subcategory,
             subcategory_ids: subcategory_ids,
             examples_ids: [], //new subcategory, reseting examples..
+            examples_length: examples_length,//length of current subcategory's examples
             voice: retrieve_Strings("voices",sessionAttributes.native_language),
             break: 0,
         });
@@ -1392,7 +1445,7 @@ const ExampleIntent = {
 
         const slots = handlerInput.requestEnvelope.request.intent.slots;
         let resume = slots['continue'] != undefined ? slots['continue'].value : undefined;
-        let random = slots['random'] != undefined ? slots['random'].value : undefined;
+        let random = slots['random_example'] != undefined ? slots['random_example'].value : undefined;
         let output="";
         let category = sessionAttributes.category;
         let subcategory = sessionAttributes.subcategory;
@@ -1468,7 +1521,7 @@ const ExampleIntent = {
                     {//further checks for example strings. subcategory info collected successfully
                         if (subcategory_info.native_words.length > examples_ids.length)
                         {//still some examples left -> do nothing, get next or next random example from function..
-                            output += "1:"+ retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                            output += retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
                         }
                         else
                         {//all exmaples are done. change subcategory.
@@ -1486,19 +1539,17 @@ const ExampleIntent = {
                                         break;
                                     }
                                 }
-                                if (id != undefined)
-                                {//valid subcategory id
-                                    output+= retrieve_Strings("general",sessionAttributes.native_language,"next_subcategory")+subcategory;
-                                    subcategory_ids.push(id);
-                                    subcategory_ids.sort(sortIds);
-                                    example_ids = [];
-                                    subcategory = createReturnList('title',sessionAttributes,category_subcategories,"native")[id];
-                                    output += "2"+retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . "+ retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                                if (id == undefined)
+                                {//adding next subcategory id
+                                    id = subcategory_ids[subcategory_ids.length-1]+1;
                                 }
-                                else
-                                {//id not found or not wrong with content
-                                    output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error")
-                                }
+
+                                subcategory_ids.push(id);
+                                subcategory_ids.sort(sortIds);
+                                example_ids = [];
+                                subcategory = createReturnList('title',sessionAttributes,category_subcategories,"native")[id];                                
+                                output+= retrieve_Strings("general",sessionAttributes.native_language,"next_subcategory")+" "+subcategory+". ";
+                                output += retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory.replace(","," and")+" . "+ retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
                             }
                             else
                             {//need to change to new category
@@ -1515,17 +1566,44 @@ const ExampleIntent = {
                                 subcategory = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native")[0];
                                 //pushing to subcategory_ids the first sub_id.
                                 subcategory_ids.push(0);
-                                output += "3:"+retrieve_Strings("general",sessionAttributes.native_language,"subcategory_completed")+retrieve_Strings("general",sessionAttributes.native_language,"category_completed")+retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory+". "+retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
+                                output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_completed")+retrieve_Strings("general",sessionAttributes.native_language,"category_completed")+retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+retrieve_Strings("general",sessionAttributes.native_language,"new_subcategory")+subcategory+". "+retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
                             }
                         }
                     }
+                    
                     //categories/subcategories should be set here
                     new_example_entry = getExample(handlerInput,subcategory_info,examples_ids,random);
-                    if (new_example_entry)
+                
+                    Object.assign(sessionAttributes,{debug: "after get example"});
+                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                    //check if empty example.. empty line of information in csv file. handled by empty info message
+                    return handlerInput.responseBuilder
+                    .withShouldEndSession(false)
+                    .speak("TEST:"+Object.keys(new_example_entry)+Object.values(new_example_entry))
+                    .getResponse();
+                    if (new_example_entry.learning_word != undefined && new_example_entry.native_word != undefined)
                     {//example validation done. updating values
                         Object.assign(sessionAttributes,new_example_entry);
                         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                        /* Object.assign(sessionAttributes,
+                            {
+                                voice: retrieve_Strings("voices",sessionAttributes.learning_language),
+                                break: 1,
+                                level: "strong",
+                            });
+                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                        output = output+switchVoice(sessionAttributes.learning_word,sessionAttributes);
+                        Object.assign(sessionAttributes,
+                            {
+                                voice: retrieve_Strings("voices",sessionAttributes.native_language),
+                                break: 1,
+                                level: "strong",
+                            });
+                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                        output = output+" "+switchVoice(sessionAttributes.native_word,sessionAttributes); */  
                     }
+                    else
+                        output += retrieve_Strings("warnings",sessionAttributes.native_language,"empty_info")+",learning:"+new_example_entry.learning_word+", native:"+new_example_entry.native_word;
                     
                 }
             }
@@ -2176,7 +2254,7 @@ function getExample(handlerInput,subcategory_info,examples_ids,random)
                     break;
                 }
             }
-            //examples were done in sequence add the very next
+             //examples were done in sequence add he very next
             if (example_id == undefined)
                 example_id = examples_ids.length;
         }
@@ -2199,7 +2277,6 @@ function getExample(handlerInput,subcategory_info,examples_ids,random)
             native_phrase: subcategory_info.native_phrases[example_id],
             learning_phrase: subcategory_info.learning_phrases[example_id],
             examples_ids: examples_ids.sort(sortIds),
-            test: example_id,
         });
     }
     else 
