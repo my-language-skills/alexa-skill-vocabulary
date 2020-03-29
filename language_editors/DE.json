@@ -28,12 +28,55 @@
                     ]
                 },
                 {
-                    "name": "ShowCategories",
+                    "name": "UserSelectionIntent",
+                    "slots": [
+                        
+                        {
+                            "name": "random",
+                            "type": "random_list"
+                        },
+                        {
+                            "name": "option_selection",
+                            "type": "random_option_list"
+                        }
+                    ],
+                    "samples" :[
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
+                        "open {option_selection}"
+                    ]
+                },
+                {
+                    "name": "UserCategorySelectionIntent",
                     "slots": [
                         {
-                            "name": "category",
-                            "type": "categories_list"
-                        },
+                            "name": "query",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples" :[
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}"
+                    ]
+                },
+                {
+                    "name": "UserSubcategorySelectionIntent",
+                    "slots": [
+                        {
+                            "name": "query",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples" :[
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}"
+                    ]
+                },
+                {
+                    "name": "ShowCategoriesIntent",
+                    "slots":[
                         {
                             "name": "option",
                             "type": "option_list"
@@ -53,18 +96,9 @@
                         "mostrar todo {option}",
                         "Afficher tout {option}",
                         "zeige alles {option}",
-                        "mostra tutto {option}",
-                        "{category} subcategories",
-                        "{category} subcategorias",
-                        "{category} sous-catégories",
-                        "{category} Unterkategorien",
-                        "{category} sottocategorie",
-                        "{category} list",
-                        "{category} lista",
-                        "{category} liste",
-                        "{category}"
+                        "mostra tutto {option}"
                     ]
-                },
+                },                
                 {
                     "name": "RepeatMessageIntent",
                     "slots": [
@@ -90,44 +124,6 @@
                     ]
                 },
                 {
-                    "name": "SelectCategoryIntent",
-                    "slots": [
-                        {
-                            "name": "category",
-                            "type": "categories_list"
-                        },
-                        {
-                            "name": "random",
-                            "type": "random_list"
-                        },
-                        {
-                            "name": "subcategory",
-                            "type": "sub_categories_list"
-                        },
-                        {
-                            "name": "continue_",
-                            "type": "continue_in_cat_list"
-                        },
-                        {
-                            "name": "random_option",
-                            "type": "random_option_list"
-                        }
-                    ],
-                    "samples": [
-                        "{category} {subcategory}",
-                        "{subcategory} {category}",
-                        "{subcategory}",
-                        "{subcategory} of {category}",
-                        "{random} {category}",
-                        "{random} {random_option}",
-                        "{random_option} {random}",
-                        "{category} {random}",
-                        "{category} {random} subcategory",
-                        "{category} subcategory {random}",
-                        "{continue_}"
-                    ]
-                },
-                {
                     "name": "ExampleIntent",
                     "slots": [
                         {
@@ -135,17 +131,31 @@
                             "type": "continue_in_sub_list"
                         },
                         {
-                            "name": "random",
+                            "name": "random_example",
                             "type": "random_list"
                         }
                     ],
                     "samples": [
-                        "{random}",
-                        "{continue}",
-                        "{random} {continue}",
-                        "{continue} {random}",
-                        "{continue} subcategory",
-                        "subcategory {continue}"
+                        "{random_example} example",
+                        "{continue} ",
+                        "{random_example} {continue} example",
+                        "{continue} {random_example} example",
+                        "{random_example} ejemplo",
+                        "{continue} ",
+                        "{random_example} {continue} ejemplo",
+                        "{continue} {random_example} ejemplo",
+                        "{random_example} exemple",
+                        "{continue} ",
+                        "{random_example} {continue} exemple",
+                        "{continue} {random_example} exemple",
+                        "{random_example} aktuelles",
+                        "{continue} ",
+                        "{random_example} {continue} aktuelles",
+                        "{continue} {random_example} aktuelles",
+                        "{random_example} esempio",
+                        "{continue} ",
+                        "{random_example} {continue} esempio",
+                        "{continue} {random_example} esempio"
                     ]
                 },
                 {
@@ -250,23 +260,6 @@
                             "name": {
                                 "value": "learning",
                                 "synonyms": ["aprendizaje", "seconde","Lernen","apprendimento"]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "categories_list",
-                    "values": [
-                        {
-                            "name": {
-                                "value": "existential notions",
-                                "synonyms": ["NOCIONES EXISTENCIALES"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "quantitative",
-                                "synonyms": ["NOCIONES CUANTITATIVAS"]
                             }
                         }
                     ]
@@ -532,71 +525,6 @@
                             "name": {
                                 "value": "repeat normal",
                                 "synonyms": ["repetir normal","répéter normal","wiederhole normal","ripeti normale"]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "sub_categories_list",
-                    "values": [
-                        {
-                            "name": {
-                                "value": "existence, lack of existence",
-                                "synonyms": ["Existencia, inexistencia"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "presence, absence",
-                                "synonyms": ["Presencia, ausencia"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "general quality",
-                                "synonyms": ["Cualidad general"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "event",
-                                "synonyms": ["Acontecimiento"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "certainty, uncertainty",
-                                "synonyms": ["Certeza, incertidumbre"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "numerical quantity",
-                                "synonyms": ["Numerical quantity"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "cardinal numbers",
-                                "synonyms": ["Números cardinales"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "ordinal numbers",
-                                "synonyms": ["Números ordinales"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "relative quantity",
-                                "synonyms": ["Cantidad relativa"]
-                            }
-                        },
-                        {
-                            "name": {
-                                "value": "degree",
-                                "synonyms": ["Grado"]
                             }
                         }
                     ]

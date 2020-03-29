@@ -347,7 +347,7 @@ module.exports =
 				german_phrase:	['<lang xml:lang="de-DE"></lang>','<lang xml:lang="de-DE"></lang>',],
 				french_phrase:	['<lang xml:lang="fr-FR"></lang>','<lang xml:lang="fr-FR"></lang>',],
 				italian_phrase:	['<lang xml:lang="it-IT">La mia casa non ha il terrazzo.</lang>','<lang xml:lang="it-IT">Vivo a Barcellona.</lang>',],
-			},
+			}, 
 			{
 				english_title:	'<lang xml:lang="en-US">Presence, absence</lang>',
 				spanish_title:	'<lang xml:lang="es-ES">Presencia, ausencia</lang>',

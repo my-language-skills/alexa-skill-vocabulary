@@ -16,7 +16,7 @@ const content = function(level = 'a1')
     {
         case "A1":
             {
-                return  require('./content_a1') ? require('./content_a1').CONTENT : false;
+                return  require('./content_files/content_a1') ? require('./content_files/content_a1').CONTENT : false;
                
             }
         default:
@@ -31,7 +31,7 @@ module.exports.content = content;
  */
 const lang_strings = function()
 {
-   return require('./language_strings') ? require('./language_strings').CONTENT : false;
+   return require('./content_files/language_strings') ? require('./content_files/language_strings').CONTENT : false;
 };
 module.exports.content_language_strings = lang_strings;
 
@@ -41,6 +41,6 @@ module.exports.content_language_strings = lang_strings;
  */
 const editor_options = function()
 {
-    return require('./edtior_options') ? require('./editor_options').CONTENT : false;
+    return require('./content_files/editor_options') ? require('./content_files/editor_options').CONTENT : false;
 }
 module.exports.editor_options = editor_options;

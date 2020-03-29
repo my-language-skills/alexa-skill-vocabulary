@@ -1,7 +1,7 @@
 # alexa-skill-vocabulary
 * Conrtibutors: @CharalamposTheodorou
-* Tags: alexa, skill, amazon
-* Current version: 1.1
+* Tags: alexa, skill, amazon, alexa skit
+* Current version: 1.0
 
 ## Description:
 - Amazon Alexa skill for learning Vocabulary.
@@ -23,11 +23,6 @@ All requests can be given in both native or learning language except when:
 
 
 ## Versions
- * 1.1:
-    * Changes:
-        - New language editor temp file, updated way to handle intentions (with option for dynamic usage of categories or subcategories available)
-        - In index file, updated way to handle the intents and requirement files (to not load everything every time, a part of the file so that the process is not overwhelmed)
-
  * 1.0:
     * Json Editors for Alexa:
         - 5 language editor files.
@@ -40,4 +35,4 @@ All requests can be given in both native or learning language except when:
         - 1 language strings file that contains all Alexa response messages in all languages available.
     * Skill Operation files:
         - 1 main file of operation: index.js. This file handles all Intents of the skill.
-        - 1 external file that is responsible to require all necessary external content files (Mutation in futuer versions to load specific content files).
+        - 1 external file that is responsible to require all necessary external content files (Mutation in further versions to load specific content files).
