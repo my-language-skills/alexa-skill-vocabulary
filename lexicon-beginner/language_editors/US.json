@@ -41,18 +41,18 @@
                         }
                     ],
                     "samples" :[
-                        "open {option_selection} {random}",
-                        "open {random} {option_selection}",
-                        "open {option_selection}",
-                        "open {option_selection} {random}",
-                        "open {random} {option_selection}",
-                        "open {option_selection}",
-                        "open {option_selection} {random}",
-                        "open {random} {option_selection}",
-                        "open {option_selection}",
-                        "open {option_selection} {random}",
-                        "open {random} {option_selection}",
-                        "open {option_selection}",
+                        "öffnen {option_selection} {random}",
+                        "öffnen {random} {option_selection}",
+                        "öffnen {option_selection}",
+                        "abrir {option_selection} {random}",
+                        "abrir {random} {option_selection}",
+                        "abrir {option_selection}",
+                        "ouvrir {option_selection} {random}",
+                        "ouvrir {random} {option_selection}",
+                        "ouvrir {option_selection}",
+                        "aprire {option_selection} {random}",
+                        "aprire {random} {option_selection}",
+                        "aprire {option_selection}",
                         "open {option_selection} {random}",
                         "open {random} {option_selection}",
                         "open {option_selection}"
@@ -67,21 +67,21 @@
                         }
                     ],
                     "samples" :[
+                        "kategorie ändern in {query}",
+                        "kategorie ändern {query}",
+                        "offene Kategorie {query}",
+                        "cambiar categoría a {query}",
+                        "cambiar categoría {query}",
+                        "abrir categoría {query}",
+                        "changer la catégorie en {query}",
+                        "changer de catégorie {query}",
+                        "catégorie ouverte {query}",
+                        "cambia categoria in {query}",
+                        "cambia categoria {query}",
+                        "categoria aperta {query}",
                         "change category to {query}",
                         "change category {query}",
-                        "open category {query}",
-                        "change category to {query}",
-                        "change category {query}",
-                        "open category {query}",
-                        "change category to {query}",
-                        "change category {query}",
-                        "open category {query}",
-                        "change category to {query}",
-                        "change category {query}",
-                        "open category {query}",
-                        "change category to {query}",
-                        "change category {query}",
-                        "open category {query}",
+                        "open category {query}"
                     ]
                 },
                 {
@@ -93,18 +93,18 @@
                         }
                     ],
                     "samples" :[
-                        "change subcategory to {query}",
-                        "change subcategory {query}",
-                        "open subcategory {query}",
-                        "change subcategory to {query}",
-                        "change subcategory {query}",
-                        "open subcategory {query}",
-                        "change subcategory to {query}",
-                        "change subcategory {query}",
-                        "open subcategory {query}",
-                        "change subcategory to {query}",
-                        "change subcategory {query}",
-                        "open subcategory {query}",
+                        "unterkategorie ändern in {query}",
+                        "unterkategorie ändern {query}",
+                        "offene Unterkategorie {query}",
+                        "cambiar subcategoría a {query}",
+                        "cambiar subcategoría {query}",
+                        "abrir subcategoría {query}",
+                        "changer la sous-catégorie en {query}",
+                        "changer de sous-catégorie {query}",
+                        "sous-catégorie ouverte {query}",
+                        "cambia la sottocategoria in {query}",
+                        "cambia sottocategoria {query}",
+                        "apri la sottocategoria {query}",
                         "change subcategory to {query}",
                         "change subcategory {query}",
                         "open subcategory {query}"
@@ -130,7 +130,7 @@
                         "{option} lista",
                         "show all {option}",
                         "mostrar todo {option}",
-                        "Afficher tout {option}",
+                        "afficher tout {option}",
                         "zeige alles {option}",
                         "mostra tutto {option}"
                     ]
@@ -227,9 +227,9 @@
                         "{request}",
                         "what is my {request}",
                         "show me {request}",
-                        "Muéstrame {request}",
+                        "muéstrame {request}",
                         "montre moi {request}",
-                        "Zeig es mir {request}",
+                        "zeig es mir {request}",
                         "fammi vedere {request}"
                     ]
                 },
@@ -252,13 +252,13 @@
                         "lernen {language}",
                         "imparare {language}",
                         "change {language_type} language to {language}",
-                        "Cambia  {language_type} lingua to {language}",
-                        "ändere {language_type} Sprache to {language}",
+                        "cambia  {language_type} lingua to {language}",
+                        "ändere {language_type} sprache to {language}",
                         "cambio {language_type} lengua to {language}",
                         "changer  {language_type} langue  to {language}",
                         "{language_type} language to {language}",
                         "{language_type} lingua to {language}",
-                        "{language_type} Sprache to {language}",
+                        "{language_type} sprache to {language}",
                         "{language_type} lengua to {language}",
                         "{language_type} langue to {language}"
                     ]
@@ -277,13 +277,13 @@
                         {
                             "name": {
                                 "value": "mother",
-                                "synonyms": ["madre","mère","Mutter", "madre"]
+                                "synonyms": ["madre","mère","mutter", "madre"]
                             }
                         },
                         {
                             "name": {
                                 "value": "teaching",
-                                "synonyms": ["enseñando","enseignement","Lehren","insegnamento"]
+                                "synonyms": ["enseñando","enseignement","lehren","insegnamento"]
                             }
                         },
                         {
@@ -312,7 +312,7 @@
                         {
                             "name": {
                                 "value": "slower",
-                                "synonyms": ["más lento","Ralentissez","Langsamer","Più lentamente"]
+                                "synonyms": ["más lento","ralentissez","langsamer","più lentamente"]
                             }
                         }
                     ]
@@ -323,7 +323,7 @@
                         {
                             "name": {
                                 "value": "louder",
-                                "synonyms": ["mas fuerte","Plus fort","lauter","più forte"]
+                                "synonyms": ["mas fuerte","plus fort","lauter","più forte"]
                             }
                         },
                         {
@@ -340,19 +340,19 @@
                         {
                             "name": {
                                 "value": "help",
-                                "synonyms": ["ayuda","Aidez-moi","Hilfe","Aiuto"]
+                                "synonyms": ["ayuda","aidez-moi","hilfe","aiuto"]
                             }
                         },
                         {
                             "name": {
                                 "value": "instructions",
-                                "synonyms": ["instrucciones","instructions","Anleitung","Istruzioni"]
+                                "synonyms": ["instrucciones","instructions","anleitung","istruzioni"]
                             }
                         },
                         {
                             "name": {
                                 "value": "options",
-                                "synonyms": ["opciones","options","Optionen","opzioni"]
+                                "synonyms": ["opciones","options","optionen","opzioni"]
                             }
                         }
                     ]
@@ -363,49 +363,49 @@
                         {
                             "name": {
                                 "value": "current category",
-                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle Kategorie","categoria attuale"]
+                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle kategorie","categoria attuale"]
                             }
                         },
                         {
                             "name": {
                                 "value": "current subcategory",
-                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle Unterkategorie","sottocategoria corrente"]
+                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle unterkategorie","sottocategoria corrente"]
                             }
                         },
                         {
                             "name": {
                                 "value": "current example",
-                                "synonyms": ["ejemplo actual","exemple actuel","aktuelles Beispiel","esempio attuale"]
+                                "synonyms": ["ejemplo actual","exemple actuel","aktuelles beispiel","esempio attuale"]
                             }
                         },
                         {
                             "name": {
                                 "value": "native language",
-                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","lingua nativa"]
+                                "synonyms": ["lengua materna","langue maternelle","muttersprache","lingua nativa"]
                             }
                         },
                         {
                             "name": {
                                 "value": "mother language",
-                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","madre lingua"]
+                                "synonyms": ["lengua materna","langue maternelle","muttersprache","madre lingua"]
                             }
                         },
                         {
                             "name": {
                                 "value": "learning language",
-                                "synonyms": ["aprendiendo idioma","apprendre une langue","Sprache lernen","apprendimento della lingua"]
+                                "synonyms": ["aprendiendo idioma","apprendre une langue","sprache lernen","apprendimento della lingua"]
                             }
                         },
                         {
                             "name": {
                                 "value": "language list",
-                                "synonyms": ["lista de idiomas","liste des langues","Sprachliste","elenco delle lingue"]
+                                "synonyms": ["lista de idiomas","liste des langues","sprachliste","elenco delle lingue"]
                             }
                         },
                         {
                             "name": {
                                 "value": "category list",
-                                "synonyms": ["Lista de categoría","liste des catégories","Kategorieliste","elenco di categorie"]
+                                "synonyms": ["lista de categoría","liste des catégories","kategorieliste","elenco di categorie"]
                             }
                         }
                     ]
@@ -422,7 +422,7 @@
                         {
                             "name": {
                                 "value": "phrase",
-                                "synonyms": ["frase","frase","Phrase","frase"]
+                                "synonyms": ["frase","frase","phrase","frase"]
                             }
                         }
                     ]
@@ -433,13 +433,13 @@
                         {
                             "name": {
                                 "value": "another",
-                                "synonyms": ["Otro","autre","weiterer","altro"]
+                                "synonyms": ["otro","autre","weiterer","altro"]
                             }
                         },
                         {
                             "name": {
                                 "value": "next",
-                                "synonyms": ["siguiente","suivant","Nächster","prossimo"]
+                                "synonyms": ["siguiente","suivant","nächster","prossimo"]
                             }
                         },
                         {
@@ -456,31 +456,31 @@
                         {
                             "name": {
                                 "value": "english",
-                                "synonyms": ["inglés","Anglais","Englisch","inglese"]
+                                "synonyms": ["inglés","anglais","englisch","inglese"]
                             }
                         },
                         {
                             "name": {
                                 "value": "spanish",
-                                "synonyms": ["español","Espagnol","Spanisch","spagnolo"]
+                                "synonyms": ["español","espagnol","spanisch","spagnolo"]
                             }
                         },
                         {
                             "name": {
                                 "value": "italian",
-                                "synonyms": ["italiano","italien","Italienisch","italiano"]
+                                "synonyms": ["italiano","italien","italienisch","italiano"]
                             }
                         },
                         {
                             "name": {
                                 "value": "french",
-                                "synonyms": ["francés","Français","Französisch","francese"]
+                                "synonyms": ["francés","français","französisch","francese"]
                             }
                         },
                         {
                             "name": {
                                 "value": "german",
-                                "synonyms": ["aleman","allemand","Deutsche","tedesca"]
+                                "synonyms": ["aleman","allemand","deutsche","tedesca"]
                             }
                         }
                     ]
@@ -491,13 +491,13 @@
                         {
                             "name": {
                                 "value": "next category",
-                                "synonyms": ["siguiente categoría","catégorie suivante","nächste Kategorie","prossima categoria"]
+                                "synonyms": ["siguiente categoría","catégorie suivante","nächste kategorie","prossima categoria"]
                             }
                         },
                         {
                             "name": {
                                 "value": "another category",
-                                "synonyms": ["otra categoría","autre catégorie","andere Kategorie","altra categoria"]
+                                "synonyms": ["otra categoría","autre catégorie","andere kategorie","altra categoria"]
                             }
                         }
                     ]
@@ -508,13 +508,13 @@
                         {
                             "name": {
                                 "value": "categories",
-                                "synonyms": ["categorías","catégories","Kategorien","categorie"]
+                                "synonyms": ["categorías","catégories","kategorien","categorie"]
                             }
                         },
                         {
                             "name": {
                                 "value": "subcategories",
-                                "synonyms": ["subcategorias","sous-catégories","Unterkategorien","sottocategorie"]
+                                "synonyms": ["subcategorias","sous-catégories","unterkategorien","sottocategorie"]
                             }
                         }
                     ]
@@ -525,13 +525,13 @@
                         {
                             "name": {
                                 "value": "category",
-                                "synonyms": ["categoría","Catégorie","Kategorie","categoria"]
+                                "synonyms": ["categoría","catégorie","kategorie","categoria"]
                             }
                         },
                         {
                             "name": {
                                 "value": "subcategory",
-                                "synonyms": ["subcategoría","sous-catégorie","Unterkategorie","sottocategoria"]
+                                "synonyms": ["subcategoría","sous-catégorie","unterkategorie","sottocategoria"]
                             }
                         }
                     ]
@@ -571,13 +571,13 @@
                         {
                             "name": {
                                 "value": "random",
-                                "synonyms": ["aleatorio","Aléatoire","zufällig","casuale"]
+                                "synonyms": ["aleatorio","aléatoire","zufällig","casuale"]
                             }
                         },
                         {
                             "name": {
                                 "value": "shuffle",
-                                "synonyms": ["barajar","mélanger","Mischen","rimescolare"]
+                                "synonyms": ["barajar","mélanger","mischen","rimescolare"]
                             }
                         }
                     ]
