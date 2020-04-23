@@ -43,6 +43,18 @@
                     "samples" :[
                         "open {option_selection} {random}",
                         "open {random} {option_selection}",
+                        "open {option_selection}",
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
+                        "open {option_selection}",
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
+                        "open {option_selection}",
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
+                        "open {option_selection}",
+                        "open {option_selection} {random}",
+                        "open {random} {option_selection}",
                         "open {option_selection}"
                     ]
                 },
@@ -57,7 +69,19 @@
                     "samples" :[
                         "change category to {query}",
                         "change category {query}",
-                        "open category {query}"
+                        "open category {query}",
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}",
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}",
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}",
+                        "change category to {query}",
+                        "change category {query}",
+                        "open category {query}",
                     ]
                 },
                 {
@@ -69,6 +93,18 @@
                         }
                     ],
                     "samples" :[
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}",
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}",
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}",
+                        "change subcategory to {query}",
+                        "change subcategory {query}",
+                        "open subcategory {query}",
                         "change subcategory to {query}",
                         "change subcategory {query}",
                         "open subcategory {query}"
