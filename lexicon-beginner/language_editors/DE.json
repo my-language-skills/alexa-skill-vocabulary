@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "lexicon",
+            "invocationName": "Lexikon Anfänger",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
@@ -30,7 +30,7 @@
                 {
                     "name": "UserSelectionIntent",
                     "slots": [
-                        
+
                         {
                             "name": "random",
                             "type": "random_list"
@@ -98,7 +98,7 @@
                         "zeige alles {option}",
                         "mostra tutto {option}"
                     ]
-                },                
+                },
                 {
                     "name": "RepeatMessageIntent",
                     "slots": [
