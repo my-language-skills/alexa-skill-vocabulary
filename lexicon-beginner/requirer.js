@@ -6,22 +6,22 @@
 
 /**
  * This function takes parameter the level of education of the user and returns
- * the necessary node.js content files. 
- * 
+ * the necessary node.js content files.
+ *
  * @param {string} level the request level for content files. level of vocabulary to return
  */
 const content = function(level = 'a1')
-{   
+{
     switch(level.toUpperCase())
     {
         case "A1":
             {
-                return  require('./content_files/content_a1') ? require('./content_files/content_a1').CONTENT : false;
-               
+                return  require('./content_files/content_lexicon_begginer') ? require('./content_files/content_lexicon_begginer').CONTENT : false;
+
             }
         default:
             return false;
-    } 
+    }
 };
 module.exports.content = content;
 
