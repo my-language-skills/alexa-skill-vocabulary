@@ -31,7 +31,7 @@ module.exports = {
             {
                 language: "english",
                 options: "Say Options to get the available steps. ",
-                suggested_example: "You can say random category or random subcategory. ",
+                suggested_example: "You can say random category. ",
                 category_list: "The categories are: ",
                 subcategory_list: "The subcategories are: ",
                 new_category: "Category selected: ",
@@ -45,7 +45,7 @@ module.exports = {
             {
                 language: "french",
                 options: "Say Options to get the available steps. ",
-                suggested_example: "You can say random category or random subcategory. ",
+                suggested_example: "You can say random category. ",
                 category_list: "The categories are: ",
                 subcategory_list: "The subcategories are: ",
                 new_category: "Category selected: ",
