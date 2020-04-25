@@ -109,7 +109,7 @@ module.exports = {
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
-                reset: "Learning language has changed, select category to continue. "
+                reset: "Language has changed, select category to continue. "
             },
             {
                 language: "french",
@@ -119,7 +119,7 @@ module.exports = {
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
-                reset: "Learning language has changed, select category to continue. "
+                reset: "Language has changed, select category to continue. "
             },
             {
                 language: "german",
