@@ -104,7 +104,7 @@ module.exports = {
             {
                 language: "english",
                 launch: "Select a learning language to get started. Say Options to get the available steps. ",
-                show_categories: "You have to select both a category and a subcategory before preceeding . Random is always an option. ",
+                show_categories: "You have to select both a category and a subcategory before preceeding . ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
@@ -114,7 +114,7 @@ module.exports = {
             {
                 language: "french",
                 launch: "Select a learning language to get started. Say Options to get the available steps. ",
-                show_categories: "You have to select both a category and a subcategory before preceeding . Random is always an option. ",
+                show_categories: "You have to select both a category and a subcategory before preceeding . ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
@@ -157,7 +157,7 @@ module.exports = {
             {
                 language: "english",
                 welcome: "Say learn and the language. Say language list to get all languages available. Say change native language to and the language if you need a different native language. ",
-                show_categories: "Say show categories or subcategories to see list of categories or subcategories. ",
+                show_categories: "Say show categories or subcategories to see list of categories or subcategories. Random is always an option. ",
                 select_categories: "Say random to give the next random example. Say next to give next in order example. View current subcategory by saying view subcategory. Say next category to move forward. ",
                 example: "Say random to give the next random example. Say next to give next in order example. View current example by saying view example. ",
                 details: "Say the language you want to view and word or phrase. ",
@@ -168,7 +168,7 @@ module.exports = {
             {
                 language: "french",
                 welcome: "Say learn and the language. Say language list to get all languages available. Say change native language to and the language if you need a different native language. ",
-                show_categories: "Say show categories or subcategories to see list of categories or subcategories. ",
+                show_categories: "Say show categories or subcategories to see list of categories or subcategories. Random is always an option. ",
                 select_categories: "Say random to give the next random example. Say next to give next in order example. View current subcategory by saying view subcategory. Say next category to move forward. ",
                 example: "Say random to give the next random example. Say next to give next in order example. View current example by saying view example. ",
                 details: "Say the language you want to view and word or phrase. ",
