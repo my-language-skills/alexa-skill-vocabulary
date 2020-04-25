@@ -467,7 +467,7 @@ const LanguageSelectionIntent = {
                         output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection");
                     else
                     {//validation for changing native language is approved
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"native_selection")+language+". ";
+                        output = retrieve_Strings("warnings",language,"native_selection")+language+". ";
                         native_name = language;
                         native = retrieve_Strings("translation",language,"return");
                         reset = true;
@@ -487,7 +487,7 @@ const LanguageSelectionIntent = {
                         output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //both languages are the same
                     else
                     {//validation for changing learning language is approved
-                        output = retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
+                        output = retrieve_Strings("language",native,"selection")+retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
                         learning_name = language;
                         learning = retrieve_Strings("translation",language,"return");
                         reset = true;
@@ -505,7 +505,7 @@ const LanguageSelectionIntent = {
                     output = language+retrieve_Strings("warnings",sessionAttributes.native_language,"same_selection"); //if same selection for both languages
                 else
                 {//updating learning language
-                    output =  retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
+                    output =  retrieve_Strings("language",native,"selection")+retrieve_Strings("warnings",sessionAttributes.native_language,"learning_selection")+language+". ";
                     learning_name = language;
                     learning = retrieve_Strings("translation",language,"return");
                     reset = true;
@@ -548,7 +548,7 @@ const LanguageSelectionIntent = {
             output+= retrieve_Strings("warnings",sessionAttributes.native_language,"reset");
         }
         //setting appropriate voice for the return message.
-        output = switchVoice(output+retrieve_Strings("language",native,"selection")+sessionAttributes.learning_name,sessionAttributes);
+        output = switchVoice(output/* +retrieve_Strings("language",native,"selection")+sessionAttributes.learning_name */,sessionAttributes);
         return handlerInput.responseBuilder
             .withShouldEndSession(false)
             .speak(output)

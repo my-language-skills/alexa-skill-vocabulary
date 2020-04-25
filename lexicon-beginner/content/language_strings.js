@@ -314,27 +314,27 @@ module.exports = {
             {
                 language: "english",
                 list: "Languages available are English, Spanish, Italian, French and German. ",
-                selection: "Native language is English. and Learning language is "
+                selection: "Native language is English. and "
             },
             {
                 language: "french",
                 list: "Languages available are English, Spanish, Italian, French and German. ",
-                selection: "Native language is French. and Learning language is "
+                selection: "Native language is French. and "
             },
             {
                 language: "german",
                 list: "Verfügbare Sprachen sind Englisch, Spanisch, Italienisch, Französisch und Deutsch.",
-                selection: "Muttersprache ist Deutsch. und Lernsprache ist "
+                selection: "Muttersprache ist Deutsch. und "
             },
             {
                 language: "italian",
                 list: "Le lingue disponibili sono Inglese, Spagnolo, Italiano, Francese e Tedesco. ",
-                selection: "La lingua materna è l'italiano. e la lingua di apprendimento è "
+                selection: "La lingua materna è l'italiano. e "
             },
             {
                 language: "spanish",
                 list: "Las lenguas disponibles son: Alemán, Español, Francés, Inglés e Italiano. ",
-                selection: "El idioma seleccionado como nativo es Español.  Y el idioma de aprendizaje es "
+                selection: "El idioma seleccionado como nativo es Español.  Y "
             }
         ],//This must not change..
         LANGUAGE_TRANSLATIONS:
