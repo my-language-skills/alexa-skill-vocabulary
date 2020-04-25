@@ -688,7 +688,7 @@ const ShowCategoriesIntent ={
                         section= createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"native");
                         if (section != undefined) // check if section list retrieved without errors
                         {
-                            output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+sessionAttributes.category+ ". ";
+                            output+= retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
                             for (var i=0;i<section.length;i++)
                             {
                                 output += i==0 ? " " : ", ";
@@ -771,7 +771,7 @@ const UserSelectionIntent = {
                     //message for new category selection
                     output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
                     //message for subcategory list available
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
                     //get subcategory list.
                     const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
                     //updating value of subcategories length
@@ -910,7 +910,7 @@ const UserCategorySelectionIntent = {
                     //message for new category selection
                     output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
                     //message for subcategory list available
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list")+category+" . ";
+                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
                     //get subcategory list.
                     const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
                     //updating subcategories length value
