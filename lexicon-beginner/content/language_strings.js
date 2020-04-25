@@ -103,7 +103,7 @@ module.exports = {
         [
             {
                 language: "english",
-                launch: "Select a learning language to get started. Say options or instructions to get more help. ",
+                launch: "Select a learning language to get started. Say Options to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . Random is always an option. ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
@@ -113,7 +113,7 @@ module.exports = {
             },
             {
                 language: "french",
-                launch: "Select a learning language to get started. Say options or instructions to get more help. ",
+                launch: "Select a learning language to get started. Say Options to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . Random is always an option. ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
