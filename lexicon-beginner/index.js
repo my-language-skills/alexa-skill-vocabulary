@@ -121,9 +121,8 @@ const ErrorHandler = {
     handle(handlerInput, error) {
       console.log(`Error handled: ${error.message}`);
 
-      const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
       return handlerInput.responseBuilder
-        .speak("Run-Time Error: "+error.message+",debug:"+sessionAttributes.debug)
+        .speak("Run-Time Error: "+error.message)
         .getResponse();
     },
 };
@@ -885,6 +884,7 @@ const UserCategorySelectionIntent = {
         //examples length
         let examples_length = sessionAttributes.examples_length != undefined ? sessionAttributes.examples_length : 0;
         // if learning language selected doesn't show anything here..
+        
         if (sessionAttributes.learning_language == "none")
         {
             output = retrieve_Strings("warnings",sessionAttributes.native_language,"no_learning_lang");
@@ -895,10 +895,14 @@ const UserCategorySelectionIntent = {
             const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"all");
             if (category_list != undefined)
             {
-                const position = infoFound(query_response,category_list);
-                if (position != undefined)
+                //returns the numerical value of category in the category index.
+                //checks if request was given through the actual name or the index value of category
+                const position = check_if_Number(query_response) == true ? infoFound(query_response,category_list) : check_if_Number(query_response);
+                //checks if given position exists and is within range of categories index
+                if (position != undefined && position < category_list.length)
                 {//category requested is found. update values
-                    category = category_list[position];
+                    //to provide the native version of category
+                    category = category_list[position<category_list.length/2 ? position : position-(category_list.length/2)];
                     //updating subcategory value
                     subcategory = undefined;
                     //updating examples length value
@@ -1483,7 +1487,7 @@ function retrieveFromJson(sessionAttributes,category = undefined,subcategory = u
                 return category_sections[k];
             }
             else
-                test_out+= 'nope for '+k;//'not found for'+removeSSML(languageProvider(sessionAttributes.learning_language,category_sections[k],"title")).toUpperCase()+"or"+languageProvider(sessionAttributes.native_language,category_sections[k],"title").toUpperCase();
+                test_out+= 'nope for '+k;
 
         }
         return "here:"+test_out;
@@ -2282,6 +2286,20 @@ function retrieve_Strings(string_category,language,type)
     }
 }
 
+/**
+ * @description Checks if request was to give a category by name or number
+ * 
+ * @author CharalamposTheodorou
+ * @since 1.0
+ * 
+ * @param {String} query_response String to check if contains a numberical value
+ * 
+ * @return Returns true if doesn't contains a number in the request
+ */
+function check_if_Number(query_response)
+{
+    return isNaN(query_response) == true ? true : query_response;
+}
 
  /** All Intents declarations */
  const skillBuilder = Alexa.SkillBuilders.custom();
