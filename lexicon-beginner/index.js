@@ -1261,7 +1261,7 @@ const ExampleIntent = {
                 subcategory: subcategory,
                 subcategory_ids: subcategory_ids,
                 examples_length: examples_length,
-                helpmsg: "ExampleIntent",
+                helpmsg: (category!= undefined && subcategory != undefined) ? "ExampleIntent" : "ShowCategories",
                 break: 0,
                 rate: "100%",
                 volume: "medium",
