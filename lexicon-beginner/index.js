@@ -1000,12 +1000,12 @@ const UserSubcategorySelectionIntent = {
                 if (subcategory_list != undefined)
                 {
                     //id in list of native and learning subcategory names
-                    const id_temp = infoFound(query_response,subcategory_list);
-                    //setting the correct index for subcategory.
-                    const id = id_temp >= subcategory_list.length/2 ? (id_temp-subcategory_list.length/2) : id_temp;
-                    if (id!= undefined)
+                    //returns the numerical value of category in the category index.
+                    //checks if request was given through the actual name or the index value of category
+                    const id = check_if_Number(query_response) == true ? infoFound(query_response,subcategory_list) : check_if_Number(query_response);
+                    if (id!= undefined && id < subcategory_list.length)
                     {//subcategory requested is found.
-                        subcategory = subcategory_list[id];
+                        subcategory = subcategory_list[id<subcategory_list.length/2 ? id : id-(subcategory_list.length/2)];
                         //setting examples length
                         examples_length = createReturnList("word",sessionAttributes,[retrieveFromJson(sessionAttributes,sessionAttributes.category,subcategory)],"native",true)[0].length;
                         let exists=false;
