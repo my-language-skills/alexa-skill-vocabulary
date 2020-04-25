@@ -10,6 +10,11 @@ This directory contains all the content files needed for the skill to operate.
 ## Content
 - All the information of the current level of learning
 - In all available languages.
+  - It is required true/false to activate or not a word.
+  - If one word is missing....
+  - If one example is missing...
+  - If one category is missing...
+- The codes of the word ..... 
 
 
 
@@ -21,4 +26,3 @@ This directory contains all the content files needed for the skill to operate.
 
 ## language_strings
 - All the response messages given from alexa in all available languages.
-
