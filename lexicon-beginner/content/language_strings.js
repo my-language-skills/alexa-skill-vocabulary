@@ -157,7 +157,7 @@ module.exports = {
             {
                 language: "english",
                 welcome: "Say learn and the language. Say language list to get all languages available. Say change native language to and the language if you need a different native language. ",
-                show_categories: "Say show categories or subcategories to see list of categories or subcategories. Random is always an option. ",
+                show_categories: "Say show categories or subcategories to see list of categories or subcategories. You can use the index numbers of the categories as a shortcut to access the categories. Random is always an option. ",
                 select_categories: "Say next to give next in order example. Say random to give the next random example. View current subcategory by saying view subcategory. Say next category to move forward. ",
                 example: "Say random to give the next random example. Say next to give next in order example. View current example by saying view example. ",
                 details: "Say the language you want to view and word or phrase. ",
@@ -168,7 +168,7 @@ module.exports = {
             {
                 language: "french",
                 welcome: "Say learn and the language. Say language list to get all languages available. Say change native language to and the language if you need a different native language. ",
-                show_categories: "Say show categories or subcategories to see list of categories or subcategories. Random is always an option. ",
+                show_categories: "Say show categories or subcategories to see list of categories or subcategories. You can use the index numbers of the categories as a shortcut to access the categories. Random is always an option. ",
                 select_categories: "Say next to give next in order example. Say random to give the next random example. View current subcategory by saying view subcategory. Say next category to move forward. ",
                 example: "Say random to give the next random example. Say next to give next in order example. View current example by saying view example. ",
                 details: "Say the language you want to view and word or phrase. ",
