@@ -103,7 +103,7 @@ module.exports = {
         [
             {
                 language: "english",
-                launch: "Select a learning language to get started. Say Options to get the available steps. ",
+                launch: "Select a learning language to get started. Say Help or Options to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
@@ -230,7 +230,7 @@ module.exports = {
                 name_not_found: " doesn't exist in my available list .",
                 not_category: "You have to selected a category first .",
                 cancel_stop: "Thank you for using Lexicon, see you around. ",
-                
+
             },
             {
                 language:"french",
@@ -313,7 +313,7 @@ module.exports = {
         [
             {
                 language: "english",
-                list: "Languages available are English, Spanish, Italian, French and German. ",
+                list: "Languages available are English, French, German, Italian, and Spanish. ",
                 selection: "Native language is English. and "
             },
             {
