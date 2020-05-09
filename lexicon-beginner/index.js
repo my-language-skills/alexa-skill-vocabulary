@@ -573,14 +573,18 @@ const IndexIntent = {
         const request = slots['request'].value;
         let output ="";
         if (sessionAttributes.category != undefined &&
-            request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_category").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_category").toUpperCase() )
+            (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_category").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_category").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_theme").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_theme").toUpperCase()))
         {//current category
             output = request+" . "+sessionAttributes.category;
         }
         else if (sessionAttributes.subcategory != undefined &&
             (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_subcategory").toUpperCase()
-            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_subcategory").toUpperCase()))
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_subcategory").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"current_topic").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"current_topic").toUpperCase()))
         {//current subcategory
             output = request+" . "+sessionAttributes.subcategory;
         }
@@ -613,7 +617,9 @@ const IndexIntent = {
             output = retrieve_Strings("language",sessionAttributes.native_language,"list");
         }
         else if (request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"category_list").toUpperCase()
-        || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"category_list").toUpperCase())
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"category_list").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.native_language,"theme_list").toUpperCase()
+            || request.toUpperCase() == checkEditor("request_list",sessionAttributes.learning_language,"theme_list").toUpperCase())
         {//show category list
             section =  createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
             output+= retrieve_Strings("general",sessionAttributes.native_language,"category_list")+". "+section;
@@ -667,7 +673,9 @@ const ShowCategoriesIntent ={
             {//option is given. Always true
                 let section;
                 if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"categories").toUpperCase()
-                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase())
+                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"categories").toUpperCase()
+                    ||option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"themes").toUpperCase()
+                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"themes").toUpperCase())
                 {//user requested to display all categories available
                     section =  createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
                     if (section != undefined)// check if section list retrieved without errors
@@ -676,7 +684,9 @@ const ShowCategoriesIntent ={
                         output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
                 }
                 else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategories").toUpperCase()
-                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategories").toUpperCase())
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategories").toUpperCase()
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"topics").toUpperCase()
+                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"topics").toUpperCase())
                 {//user requested to display all subcategories available
                     //category must be selected first for this
                     if (sessionAttributes.category == undefined)
@@ -757,8 +767,10 @@ const UserSelectionIntent = {
         }
         else
         {//learning language set, safe to proceed
-            if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"category").toUpperCase()
-                    || option.toUpperCase() ==  checkEditor("option_list",sessionAttributes.learning_language,"category").toUpperCase())
+            if (option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"category").toUpperCase()
+                || option.toUpperCase() ==  checkEditor("random_option_list",sessionAttributes.learning_language,"category").toUpperCase()
+                || option.toUpperCase() ==  checkEditor("random_option_list",sessionAttributes.native_language,"theme").toUpperCase()
+                || option.toUpperCase() ==  checkEditor("random_option_list",sessionAttributes.learning_language,"theme").toUpperCase())
             {//option is given in native or learning language for keyword category
                 const section = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"native");
                 if (section != undefined)
@@ -792,8 +804,10 @@ const UserSelectionIntent = {
                 else
                     output += retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
             }
-            else if (option.toUpperCase() == checkEditor("option_list",sessionAttributes.native_language,"subcategory").toUpperCase()
-                    || option.toUpperCase() == checkEditor("option_list",sessionAttributes.learning_language,"subcategory").toUpperCase())
+            else if (option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"subcategory").toUpperCase()
+                    || option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.learning_language,"subcategory").toUpperCase()
+                    || option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.native_language,"topic").toUpperCase()
+                    || option.toUpperCase() == checkEditor("random_option_list",sessionAttributes.learning_language,"topic").toUpperCase())
             {//option is given in native or learning language for keyword subcategory
                 if (category != undefined)
                 {//category is set. moving to randomizing subcategories
@@ -1891,8 +1905,12 @@ function checkEditor(keyword_category,language,type)
                         {//given in english.. by program.
                             case "current_category":
                                 return retriever[i].current_category;
+                            case "current_theme":
+                                return retriever[i].current_theme;
                             case "current_subcategory":
                                 return retriever[i].current_subcategory;
+                            case "current_topic":
+                                return retriever[i].current_topic;
                             case "current_example":
                                 return retriever[i].current_example;
                             case "native_language":
@@ -1905,6 +1923,8 @@ function checkEditor(keyword_category,language,type)
                                 return retriever[i].language_list;
                             case "category_list":
                                 return retriever[i].category_list;
+                            case "theme_list":
+                                return retriever[i].theme_list;
                         }
                 }
             }
@@ -1972,9 +1992,11 @@ function checkEditor(keyword_category,language,type)
                             case "categories":
                                 return retriever[i].categories;
                             case "subcategories":
-                                return retriever[i].subcategories;/*
-                            case "index":
-                                return retriever[i].index; */
+                                return retriever[i].subcategories;
+                            case "themes":
+                                return retriever[i].themes;
+                            case "topics":
+                                return retriever[i].topics;
                         }
                 }
             }
@@ -1989,7 +2011,11 @@ function checkEditor(keyword_category,language,type)
                             case "category":
                                 return retriever[i].category;
                             case "subcategory":
-                                return retriever[i].subcategory;
+                            return retriever[i].subcategory;
+                            case "topic":
+                                return retriever[i].topic;
+                            case "theme":
+                                return retriever[i].theme;
                         }
                 }
             }

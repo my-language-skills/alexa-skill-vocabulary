@@ -81,7 +81,22 @@
                         "categoria aperta {query}",
                         "change category to {query}",
                         "change category {query}",
-                        "open category {query}"
+                        "open category {query}",
+                        "Thème ändern in {query}",
+                        "Thème ändern {query}",
+                        "offene Thème {query}",
+                        "cambiar Tema a {query}",
+                        "cambiar Tema {query}",
+                        "abrir Tema {query}",
+                        "changer la Thema en {query}",
+                        "changer de Thema {query}",
+                        "Thema ouverte {query}",
+                        "cambia Tema in {query}",
+                        "cambia Tema {query}",
+                        "Tema aperta {query}",
+                        "change theme to {query}",
+                        "change theme {query}",
+                        "open theme {query}"
                     ]
                 },
                 {
@@ -107,7 +122,22 @@
                         "apri la sottocategoria {query}",
                         "change subcategory to {query}",
                         "change subcategory {query}",
-                        "open subcategory {query}"
+                        "open subcategory {query}",
+                        "thematisch ändern in {query}",
+                        "thematisch ändern {query}",
+                        "offene thematisch {query}",
+                        "cambiar temático a {query}",
+                        "cambiar temático {query}",
+                        "abrir temático {query}",
+                        "changer la thématique en {query}",
+                        "changer de thématique {query}",
+                        "thématique ouverte {query}",
+                        "cambia la tematico in {query}",
+                        "cambia tematico {query}",
+                        "apri la tematico {query}",
+                        "change topic to {query}",
+                        "change topic {query}",
+                        "open topic {query}"
                     ]
                 },
                 {
@@ -368,8 +398,20 @@
                         },
                         {
                             "name": {
+                                "value": "current theme",
+                                "synonyms": ["Tema actual","Thema actuelle","aktuelle Thème","Tema attuale"]
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "current subcategory",
                                 "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle unterkategorie","sottocategoria corrente"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current Topic",
+                                "synonyms": ["temático actual","thématique actuelle","aktuelle thematisch","tematico corrente"]
                             }
                         },
                         {
@@ -406,6 +448,12 @@
                             "name": {
                                 "value": "category list",
                                 "synonyms": ["lista de categoría","liste des catégories","kategorieliste","elenco di categorie"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "theme list",
+                                "synonyms": ["lista de temas","liste de thèmes","Themenliste","lista dei temi"]
                             }
                         }
                     ]
@@ -516,6 +564,18 @@
                                 "value": "subcategories",
                                 "synonyms": ["subcategorias","sous-catégories","unterkategorien","sottocategorie"]
                             }
+                        },
+                        {
+                            "name": {
+                                "value": "themes",
+                                "synonyms": ["temas","thèmes","Themen","temi"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "topics",
+                                "synonyms": ["temáticos","thématique","thematisch","tema"]
+                            }
                         }
                     ]
                 },
@@ -532,6 +592,18 @@
                             "name": {
                                 "value": "subcategory",
                                 "synonyms": ["subcategoría","sous-catégorie","unterkategorie","sottocategoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Theme",
+                                "synonyms": ["Tema","Thema","Thème","Tema"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Topic",
+                                "synonyms": ["temático","thématique","thematisch","tematico"]
                             }
                         }
                     ]
