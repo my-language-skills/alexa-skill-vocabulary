@@ -897,7 +897,7 @@ const UserCategorySelectionIntent = {
             {
                 //returns the numerical value of category in the category index.
                 //checks if request was given through the actual name or the index value of category
-                const position = check_if_Number(query_response) == true ? infoFound(query_response,category_list) : check_if_Number(query_response);
+                const position = check_if_Number(query_response) == "true" ? infoFound(query_response,category_list) : check_if_Number(query_response);
                 //checks if given position exists and is within range of categories index
                 if (position != undefined && position < category_list.length)
                 {//category requested is found. update values
@@ -997,12 +997,13 @@ const UserSubcategorySelectionIntent = {
             if (sessionAttributes.category)
             {//category is set
                 const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,sessionAttributes.category),"all");
+                //output +=subcategory_list;
                 if (subcategory_list != undefined)
                 {
                     //id in list of native and learning subcategory names
                     //returns the numerical value of category in the category index.
                     //checks if request was given through the actual name or the index value of category
-                    const id = check_if_Number(query_response) == true ? infoFound(query_response,subcategory_list) : check_if_Number(query_response);
+                    const id = check_if_Number(query_response) == "true" ? infoFound(query_response,subcategory_list) : check_if_Number(query_response);
                     if (id!= undefined && id < subcategory_list.length)
                     {//subcategory requested is found.
                         subcategory = subcategory_list[id<subcategory_list.length/2 ? id : id-(subcategory_list.length/2)];
@@ -1030,7 +1031,7 @@ const UserSubcategorySelectionIntent = {
                     }
                     else
                     {//category name given was not valid/not found, assume given in different language
-                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                        output += query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
                     }
                 }
                 else
@@ -1226,10 +1227,6 @@ const ExampleIntent = {
                     //proceeding to seting up example.
                     if (new_example_entry)
                     {//example validation done. updating values
-                        output += checkEditor("continue_in_sub_list",sessionAttributes.native_language,"next")+" ";
-                        //in case random keyword give.
-                        output += random != undefined ? random : "";
-                        output += retrieve_Strings("general",sessionAttributes.native_language,"example")+ subcategory+". ";
                         //updating the values of current example to the session attributes.
                         Object.assign(sessionAttributes,new_example_entry);
                         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -2298,7 +2295,7 @@ function retrieve_Strings(string_category,language,type)
  */
 function check_if_Number(query_response)
 {
-    return isNaN(query_response) == true ? true : query_response;
+    return isNaN(query_response) == true ? "true" : query_response;
 }
 
  /** All Intents declarations */
