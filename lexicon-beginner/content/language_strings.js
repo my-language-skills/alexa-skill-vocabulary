@@ -30,12 +30,12 @@ module.exports = {
         [
             {
                 language: "english",
-                options: "Say Options to get the available steps. ",
-                suggested_example: "You can say random category. ",
-                category_list: "The categories are: ",
-                subcategory_list: "The subcategories are: ",
-                new_category: "Category selected: ",
-                new_subcategory: "Say start for learning the subcategory selected: ",
+                options: "Say Options to get the available commands. ",
+                suggested_example: "You can say random theme. ",
+                category_list: "The themes are: ",
+                subcategory_list: "The topics are: ",
+                new_category: "Theme selected: ",
+                new_subcategory: "Say start for learning the topic selected: ",
                 fallback: "Something was given wrong, please follow the instructions. See you later. ",
                 category_completed: "All subcategories are completed. ",
                 subcategory_completed: "All examples of current subcategory are completed. ",
@@ -103,10 +103,10 @@ module.exports = {
         [
             {
                 language: "english",
-                launch: "Select a learning language to get started. Say Help or Options to get the available steps. ",
+                launch: "Select a learning language to get started. Say Help to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . ",
                 example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
-                select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
+                select_categories: "You can now say start or next to move to the next example. Or say random to get a random example. ",
                 details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
                 reset: "Language has changed, select category to continue. "
