@@ -105,9 +105,9 @@ module.exports = {
                 language: "english",
                 launch: "Select a learning language to get started. Say Help to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . ",
-                example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
+                example: "Say learning word or native word to get the word or the language and then phrase to get the example. ",
                 select_categories: "You can now say start or next to move to the next example. Or say random to get a random example. ",
-                details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
+                details: "Say the language and then word or phrase to get the word or example respectively. ",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
                 reset: "Language has changed, select category to continue. "
             },
@@ -115,9 +115,9 @@ module.exports = {
                 language: "french",
                 launch: "Select a learning language to get started. Say Options to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . ",
-                example: "Say learning word or native word to get the word or spanish phrase or english phrase to get the example. ",
+                example: "Say learning word or native word to get the word or the language and then phrase to get the example. ",
                 select_categories: "You can now say start or next to move to next example. Or say random to get a random example. ",
-                details: "Say spanish word or english word to get the word or spanish phrase or english phrase to get the example.",
+                details: "Say the language and then word or phrase to get the word or example respectively. ",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
                 reset: "Language has changed, select category to continue. "
             },

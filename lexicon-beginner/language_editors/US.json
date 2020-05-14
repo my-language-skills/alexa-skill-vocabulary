@@ -64,6 +64,10 @@
                         {
                             "name": "query",
                             "type": "AMAZON.SearchQuery"
+                        },
+                        {
+                            "name": "next_theme",
+                            "type": "continue_in_cat_list"
                         }
                     ],
                     "samples" :[
@@ -96,7 +100,8 @@
                         "Tema aperta {query}",
                         "change theme to {query}",
                         "change theme {query}",
-                        "open theme {query}"
+                        "open theme {query}",
+                        "{next_theme}"
                     ]
                 },
                 {
@@ -546,6 +551,18 @@
                             "name": {
                                 "value": "another category",
                                 "synonyms": ["otra categoría","autre catégorie","andere kategorie","altra categoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "next theme",
+                                "synonyms": ["siguiente Tema","Thema suivante","nächste Thème","prossima Tema"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "another theme",
+                                "synonyms": ["otra Tema","autre Thema","andere Thème","altra Tema"]
                             }
                         }
                     ]

@@ -198,7 +198,10 @@ const HelpIntent = {
             }
             else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
             {
-                helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories" );
+                if (sessionAttributes.subcategory != undefined)
+                    helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"select_categories" );
+                else
+                    helpmsg= retrieve_Strings("help",sessionAttributes.native_language,"show_categories");
             }
             else if (sessionAttributes.helpmsg == "ExampleIntent")
             {
@@ -232,7 +235,10 @@ const HelpIntent = {
             }
             else if (sessionAttributes.helpmsg == "UserSelectionSubcategory" || sessionAttributes.helpmsg == "UserSelection" )
             {
-                helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"select_categories");
+                if (sessionAttributes.subcategory != undefined)
+                    helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"select_categories");
+                else
+                    helpmsg= retrieve_Strings("options",sessionAttributes.native_language,"show_categories");
             }
             else if (sessionAttributes.helpmsg == "ExampleIntent")
             {
@@ -889,6 +895,9 @@ const UserCategorySelectionIntent = {
 
         //the value of query_response should be a category name
         const query_response = slots['query'].value;
+        //value for next theme request
+        const next_theme = slots['next_theme'].value;
+
         let category = sessionAttributes.category;
         let subcategory = sessionAttributes.subcategory;
         let output = "";
@@ -909,40 +918,102 @@ const UserCategorySelectionIntent = {
             const category_list = createReturnList('category',sessionAttributes,retrieveFromJson(sessionAttributes),"all");
             if (category_list != undefined)
             {
-                //returns the numerical value of category in the category index.
-                //checks if request was given through the actual name or the index value of category
-                const position = check_if_Number(query_response) == "true" ? infoFound(query_response,category_list) : check_if_Number(query_response);
-                //checks if given position exists and is within range of categories index
-                if (position != undefined && position < category_list.length)
-                {//category requested is found. update values
-                    //to provide the native version of category
-                    category = category_list[position<category_list.length/2 ? position : position-(category_list.length/2)];
-                    //updating subcategory value
-                    subcategory = undefined;
-                    //updating examples length value
-                    examples_length = 0;
-                    //message for new category selection
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
-                    //message for subcategory list available
-                    output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
-                    //get subcategory list.
-                    const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
-                    //updating subcategories length value
-                    sub_length = subcategory_list.length;
-                    if (subcategory_list != undefined)
-                    {
-                        for (var i=0; i< subcategory_list.length; i++)
+                //request to select category by name or number
+                if (query_response != undefined)
+                {
+                    //returns the numerical value of category in the category index.
+                    //checks if request was given through the actual name or the index value of category
+                    const position = check_if_Number(query_response) == "true" ? infoFound(query_response,category_list) : check_if_Number(query_response);
+                    //checks if given position exists and is within range of categories index
+                    if (position != undefined && position < category_list.length)
+                    {//category requested is found. update values
+                        //to provide the native version of category
+                        category = category_list[position<category_list.length/2 ? position : position-(category_list.length/2)];
+                        //updating subcategory value
+                        subcategory = undefined;
+                        //updating examples length value
+                        examples_length = 0;
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
+                        //message for subcategory list available
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
+                        //get subcategory list.
+                        const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                        //updating subcategories length value
+                        sub_length = subcategory_list.length;
+                        if (subcategory_list != undefined)
                         {
-                            output += i==0 ? " " : ", ";
-                            output +=subcategory_list[i].replace(","," and")+" ";
+                            for (var i=0; i< subcategory_list.length; i++)
+                            {
+                                output += i==0 ? " " : ", ";
+                                output +=subcategory_list[i].replace(","," and")+" ";
+                            }
                         }
+                        else
+                            output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
                     }
                     else
-                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    {//category name given was not valid/not found, assume given in different language
+                        output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                    }
                 }
                 else
-                {//category name given was not valid/not found, assume given in different language
-                    output = query_response+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                {//request to select next theme/category.
+                    //check if request for next category/theme given in appropriate language
+                    if (next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.native_language,"next_category").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.learning_language,"next_category").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.native_language,"another_category").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.learning_language,"another_category").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.native_language,"next_theme").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.learning_language,"next_theme").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.native_language,"another_theme").toUpperCase()
+                        || next_theme.toUpperCase() == checkEditor("continue_in_cat_list",sessionAttributes.learning_language,"another_theme").toUpperCase())
+                    {
+                        if (category == undefined)
+                        {//no category/theme selected prior to this request. Add the first category available.
+                            //first category in the list
+                            category = category_list[0];
+                        }
+                        else
+                        {//category/theme was defined before, need to add the very next one.
+                            //find the position of the current category in the list
+                            const position = infoFound(category,category_list);
+                            if (position != undefined && position < category_list.length)
+                            {//position of current category/theme found
+                                //check if current category is the last one in list (add the first one again in that case)
+                                category = (position + 1) < category_list.length/2 ? category_list[position+1] : category_list[0];
+                            }
+                            else
+                            {//category name given was not valid/not found, assume given in different language
+                                output = next_theme+retrieve_Strings("warnings",sessionAttributes.native_language,"name_not_found");
+                            }
+                        }
+                        //updating values after new category/theme
+                        //updating subcategory value
+                        subcategory = undefined;
+                        //updating examples length value
+                        examples_length = 0;
+                        //message for new category selection
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"new_category")+category+" . ";
+                        //message for subcategory list available
+                        output += retrieve_Strings("general",sessionAttributes.native_language,"subcategory_list");
+                        //get subcategory list.
+                        const subcategory_list = createReturnList('title',sessionAttributes,retrieveFromJson(sessionAttributes,category),"native");
+                        //updating subcategories length value
+                        sub_length = subcategory_list.length;
+                        if (subcategory_list != undefined)
+                        {
+                            for (var i=0; i< subcategory_list.length; i++)
+                            {
+                                output += i==0 ? " " : ", ";
+                                output +=subcategory_list[i].replace(","," and")+" ";
+                            }
+                        }
+                        else
+                            output = next_theme+retrieve_Strings("warnings",sessionAttributes.native_language,"content_error");
+                    }
+                    else
+                        output+= retrieve_Strings("warnings",sessionAttributes.native_language,"different_request");
                 }
             }
             else
@@ -1978,6 +2049,10 @@ function checkEditor(keyword_category,language,type)
                                 return retriever[i].next_category;
                             case "another_category":
                                 return retriever[i].another_category;
+                            case "next_theme":
+                                return retriever[i].next_theme;
+                            case "another_theme":
+                                return retriever[i].another_theme;
                         }
                 }
             }
