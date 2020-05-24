@@ -1088,8 +1088,8 @@ const UserSubcategorySelectionIntent = {
                     //id in list of native and learning subcategory names
                     //returns the numerical value of category in the category index.
                     //checks if request was given through the actual name or the index value of category
-                    const id = check_if_Number(query_response) == "true" ? infoFound(query_response,subcategory_list) : check_if_Number(query_response)-1;
-                    if (id!= undefined && id < subcategory_list.length/2 && id >= 0 )
+                    const id = check_if_Number(query_response) == "true" ? infoFound(query_response,subcategory_list) : ( check_if_Number(query_response)>subcategory_list.length/2 ? -1 : check_if_Number(query_response)-1);
+                    if (id!= undefined && id < subcategory_list.length && id >= 0 )
                     {//subcategory requested is found.
                         subcategory = subcategory_list[id<subcategory_list.length/2 ? id : id-(subcategory_list.length/2)];
                         //setting examples length
