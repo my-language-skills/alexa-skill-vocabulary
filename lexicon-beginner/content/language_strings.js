@@ -106,7 +106,7 @@ module.exports = {
                 launch: "Select a learning language to get started. Say Help to get the available steps. ",
                 show_categories: "You have to select both a category and a subcategory before preceeding . ",
                 example: "Say the language and then word or phrase to get the word or example respectively. ",
-                select_categories: "You can now say start or next to move to the next example. Or say random to get a random example. ",
+                select_categories: "You can now say, start, or next, to move to the next example. Or say, random, to get a random example. ",
                 details: "Say the language and then word or phrase to get the word or example respectively. ",
                 resume: "Say current and category, subcategory or example to relocate yourself. ",
                 reset: "Language has changed, select category to continue. "
@@ -161,7 +161,7 @@ module.exports = {
                 select_categories: "Say next to give next in order example. Repeat, to repeat the word, Random, to give the next random example, view current subcategory, to give the next random example and next category, to move forward. ",
                 example: "Say random to give the next random example. Say next to give next in order example. View current example by saying view example. ",
                 details: "Say the language you want to view and word or phrase. ",
-                reset: "Say categories list, to get the list of available categories. Say open category, and the category name, or number to open a category. ",
+                reset: "Say theme list, to get the list of available themes. Say open theme, and the theme number, to open a theme. ",
                 resume: "Continue where you left of before. Say categories to get the list. ",
                 index: "Say next or random to continue with the next example. Say current subcategory to get the current subcategory. "
             },
