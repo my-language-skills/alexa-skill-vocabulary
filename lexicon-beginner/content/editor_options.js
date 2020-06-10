@@ -81,8 +81,8 @@ module.exports = {
             },
             {
                 language: "spanish",
-                louder: "mas fuerte",
-                quieter: "más tranquil",
+                louder: "más alto",
+                quieter: "más bajo",
             },
             {
                 language: "french",
@@ -152,15 +152,15 @@ module.exports = {
             {
                 language: "spanish",
                 current_category: "categoría actual",
-                current_theme: "Tema actual",
+                current_theme: "tema actual",
                 current_subcategory: "subcategoría actual",
-                current_topic: "temático actual",
+                current_topic: "topic actual",
                 current_example: "ejemplo actual",
                 native_language: "lengua materna",
                 mother_language: "lengua materna",
                 learning_language: "aprendiendo idioma",
                 language_list: "lista de idiomas",
-                category_list: "Lista de categoría",
+                category_list: "Lista de categorias",
                 theme_list: "lista de temas",
             },
             {
@@ -281,7 +281,7 @@ module.exports = {
                 next_category: "siguiente categoría",
                 another_category: "otra categoría",
                 next_theme:"siguiente Tema",
-                another_theme:"otra Tema",
+                another_theme:"otro Tema",
             },
             {
                 language: "french",
@@ -320,7 +320,7 @@ module.exports = {
                 categories: "categorías",
                 subcategories: "subcategorias",
                 themes: "temas",
-                topics: "temáticos",
+                topics: "topics",
                // index: "índice",
             },
             {
@@ -362,7 +362,7 @@ module.exports = {
                 category: "categoría",
                 subcategory: "subcategoría",
                 theme: "Tema",
-                topic: "temático",
+                topic: "topic",
             },
             {
                 language: "french",
