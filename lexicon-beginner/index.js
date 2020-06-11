@@ -1541,7 +1541,7 @@ function retrieveFromJson(sessionAttributes,category = undefined,subcategory = u
         const cat_info_keys = Object.values(skill_files.content().CATEGORIES_INFO);
         for (var j=0; j<cat_info_keys.length; j++)
         {
-            if (removeSSML(languageProvider(sessionAttributes.learning_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase() || languageProvider(sessionAttributes.native_language,cat_info_keys[j],"category").toUpperCase() == category.toUpperCase())
+            if (removeSSML(languageProvider(sessionAttributes.learning_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase() || removeSSML(languageProvider(sessionAttributes.native_language,cat_info_keys[j],"category")).toUpperCase() == category.toUpperCase())
             {//category name found in learning or native language
                 category = removeSSML(languageProvider("english",cat_info_keys[j],"category"));
             }
