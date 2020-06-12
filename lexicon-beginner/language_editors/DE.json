@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "Lexikon Anfänger",
+            "invocationName": "lexikon anfänger",
             "intents": [
                 {
                     "name": "AMAZON.FallbackIntent",
@@ -64,12 +64,16 @@
                         {
                             "name": "query",
                             "type": "AMAZON.SearchQuery"
+                        },
+                        {
+                            "name": "next_theme",
+                            "type": "continue_in_cat_list"
                         }
                     ],
                     "samples" :[
                         "kategorie ändern in {query}",
                         "kategorie ändern {query}",
-                        "offene Kategorie {query}",
+                        "offene kategorie {query}",
                         "cambiar categoría a {query}",
                         "cambiar categoría {query}",
                         "abrir categoría {query}",
@@ -81,7 +85,23 @@
                         "categoria aperta {query}",
                         "change category to {query}",
                         "change category {query}",
-                        "open category {query}"
+                        "open category {query}",
+                        "thème ändern in {query}",
+                        "thème ändern {query}",
+                        "offene thème {query}",
+                        "cambiar tema a {query}",
+                        "cambiar tema {query}",
+                        "abrir tema {query}",
+                        "changer la thema en {query}",
+                        "changer de thema {query}",
+                        "thema ouverte {query}",
+                        "cambia tema in {query}",
+                        "cambia tema {query}",
+                        "tema aperta {query}",
+                        "change theme to {query}",
+                        "change theme {query}",
+                        "open theme {query}",
+                        "{next_theme}"
                     ]
                 },
                 {
@@ -107,7 +127,22 @@
                         "apri la sottocategoria {query}",
                         "change subcategory to {query}",
                         "change subcategory {query}",
-                        "open subcategory {query}"
+                        "open subcategory {query}",
+                        "thematisch ändern in {query}",
+                        "thematisch ändern {query}",
+                        "offene thematisch {query}",
+                        "cambiar temático a {query}",
+                        "cambiar temático {query}",
+                        "abrir temático {query}",
+                        "changer la thématique en {query}",
+                        "changer de thématique {query}",
+                        "thématique ouverte {query}",
+                        "cambia la tematico in {query}",
+                        "cambia tematico {query}",
+                        "apri la tematico {query}",
+                        "change topic to {query}",
+                        "change topic {query}",
+                        "open topic {query}"
                     ]
                 },
                 {
@@ -227,9 +262,9 @@
                         "{request}",
                         "what is my {request}",
                         "show me {request}",
-                        "Muéstrame {request}",
+                        "muéstrame {request}",
                         "montre moi {request}",
-                        "Zeig es mir {request}",
+                        "zeig es mir {request}",
                         "fammi vedere {request}"
                     ]
                 },
@@ -277,13 +312,13 @@
                         {
                             "name": {
                                 "value": "mother",
-                                "synonyms": ["madre","mère","Mutter", "madre"]
+                                "synonyms": ["madre","mère","mutter", "madre"]
                             }
                         },
                         {
                             "name": {
                                 "value": "teaching",
-                                "synonyms": ["enseñando","enseignement","Lehren","insegnamento"]
+                                "synonyms": ["enseñando","enseignement","lehren","insegnamento"]
                             }
                         },
                         {
@@ -295,7 +330,7 @@
                         {
                             "name": {
                                 "value": "learning",
-                                "synonyms": ["aprendizaje", "seconde","Lernen","apprendimento"]
+                                "synonyms": ["aprendizaje", "seconde","lernen","apprendimento"]
                             }
                         }
                     ]
@@ -306,13 +341,13 @@
                         {
                             "name": {
                                 "value": "faster",
-                                "synonyms": ["más rápido","plus rapide","schneller","Più veloce"]
+                                "synonyms": ["más rápido","plus rapide","schneller","più veloce"]
                             }
                         },
                         {
                             "name": {
                                 "value": "slower",
-                                "synonyms": ["más lento","Ralentissez","Langsamer","Più lentamente"]
+                                "synonyms": ["más lento","ralentissez","langsamer","più lentamente"]
                             }
                         }
                     ]
@@ -323,7 +358,7 @@
                         {
                             "name": {
                                 "value": "louder",
-                                "synonyms": ["mas fuerte","plus fort","lauter","più forte"]
+                                "synonyms": ["más fuerte","plus fort","lauter","più forte"]
                             }
                         },
                         {
@@ -346,7 +381,7 @@
                         {
                             "name": {
                                 "value": "instructions",
-                                "synonyms": ["instrucciones","instructions","anleitung","Istruzioni"]
+                                "synonyms": ["instrucciones","instructions","anleitung","istruzioni"]
                             }
                         },
                         {
@@ -363,13 +398,25 @@
                         {
                             "name": {
                                 "value": "current category",
-                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle Kategorie","categoria attuale"]
+                                "synonyms": ["categoría actual","catégorie actuelle","aktuelle kategorie","categoria attuale"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current theme",
+                                "synonyms": ["tema actual","thema actuelle","aktuelle thème","tema attuale"]
                             }
                         },
                         {
                             "name": {
                                 "value": "current subcategory",
-                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle Unterkategorie","sottocategoria corrente"]
+                                "synonyms": ["subcategoría actual","sous-catégorie actuelle","aktuelle unterkategorie","sottocategoria corrente"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "current Topic",
+                                "synonyms": ["temático actual","thématique actuelle","aktuelle thematisch","tematico corrente"]
                             }
                         },
                         {
@@ -381,13 +428,13 @@
                         {
                             "name": {
                                 "value": "native language",
-                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","lingua nativa"]
+                                "synonyms": ["lengua materna","langue maternelle","muttersprache","lingua nativa"]
                             }
                         },
                         {
                             "name": {
                                 "value": "mother language",
-                                "synonyms": ["lengua materna","langue maternelle","Muttersprache","madre lingua"]
+                                "synonyms": ["lengua materna","langue maternelle","muttersprache","madre lingua"]
                             }
                         },
                         {
@@ -407,6 +454,12 @@
                                 "value": "category list",
                                 "synonyms": ["lista de categoría","liste des catégories","kategorieliste","elenco di categorie"]
                             }
+                        },
+                        {
+                            "name": {
+                                "value": "theme list",
+                                "synonyms": ["lista de temas","liste de thèmes","themenliste","lista dei temi"]
+                            }
                         }
                     ]
                 },
@@ -416,7 +469,7 @@
                         {
                             "name": {
                                 "value": "word",
-                                "synonyms": ["palabra","mot","wort","parola"]
+                                "synonyms": ["palabra","mot","Wort","parola"]
                             }
                         },
                         {
@@ -439,7 +492,7 @@
                         {
                             "name": {
                                 "value": "next",
-                                "synonyms": ["siguiente","suivant","Nächster","prossimo"]
+                                "synonyms": ["siguiente","suivant","nächster","prossimo"]
                             }
                         },
                         {
@@ -491,13 +544,25 @@
                         {
                             "name": {
                                 "value": "next category",
-                                "synonyms": ["siguiente categoría","catégorie suivante","nächste Kategorie","prossima categoria"]
+                                "synonyms": ["siguiente categoría","catégorie suivante","nächste kategorie","prossima categoria"]
                             }
                         },
                         {
                             "name": {
                                 "value": "another category",
                                 "synonyms": ["otra categoría","autre catégorie","andere kategorie","altra categoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "next theme",
+                                "synonyms": ["siguiente tema","thema suivante","nächste thème","prossima tema"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "another theme",
+                                "synonyms": ["otra tema","autre thema","andere thème","altra tema"]
                             }
                         }
                     ]
@@ -516,6 +581,18 @@
                                 "value": "subcategories",
                                 "synonyms": ["subcategorias","sous-catégories","unterkategorien","sottocategorie"]
                             }
+                        },
+                        {
+                            "name": {
+                                "value": "themes",
+                                "synonyms": ["temas","thèmes","themen","temi"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "topics",
+                                "synonyms": ["temáticos","thématique","thematisch","tema"]
+                            }
                         }
                     ]
                 },
@@ -532,6 +609,18 @@
                             "name": {
                                 "value": "subcategory",
                                 "synonyms": ["subcategoría","sous-catégorie","unterkategorie","sottocategoria"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Theme",
+                                "synonyms": ["tema","thema","thème","tema"]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Topic",
+                                "synonyms": ["temático","thématique","thematisch","tematico"]
                             }
                         }
                     ]

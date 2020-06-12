@@ -73,7 +73,7 @@
                     "samples" :[
                         "kategorie ändern in {query}",
                         "kategorie ändern {query}",
-                        "offene Kategorie {query}",
+                        "offene kategorie {query}",
                         "cambiar categoría a {query}",
                         "cambiar categoría {query}",
                         "abrir categoría {query}",
@@ -86,18 +86,18 @@
                         "change category to {query}",
                         "change category {query}",
                         "open category {query}",
-                        "Thème ändern in {query}",
-                        "Thème ändern {query}",
-                        "offene Thème {query}",
-                        "cambiar Tema a {query}",
-                        "cambiar Tema {query}",
-                        "abrir Tema {query}",
-                        "changer la Thema en {query}",
-                        "changer de Thema {query}",
-                        "Thema ouverte {query}",
-                        "cambia Tema in {query}",
-                        "cambia Tema {query}",
-                        "Tema aperta {query}",
+                        "thème ändern in {query}",
+                        "thème ändern {query}",
+                        "offene thème {query}",
+                        "cambiar tema a {query}",
+                        "cambiar tema {query}",
+                        "abrir tema {query}",
+                        "changer la thema en {query}",
+                        "changer de thema {query}",
+                        "thema ouverte {query}",
+                        "cambia tema in {query}",
+                        "cambia tema {query}",
+                        "tema aperta {query}",
                         "change theme to {query}",
                         "change theme {query}",
                         "open theme {query}",
@@ -341,7 +341,7 @@
                         {
                             "name": {
                                 "value": "faster",
-                                "synonyms": ["más rápido","plus rapide","schneller","Più veloce"]
+                                "synonyms": ["más rápido","plus rapide","schneller","più veloce"]
                             }
                         },
                         {
@@ -404,7 +404,7 @@
                         {
                             "name": {
                                 "value": "current theme",
-                                "synonyms": ["Tema actual","Thema actuelle","aktuelle Thème","Tema attuale"]
+                                "synonyms": ["tema actual","thema actuelle","aktuelle thème","tema attuale"]
                             }
                         },
                         {
@@ -458,7 +458,7 @@
                         {
                             "name": {
                                 "value": "theme list",
-                                "synonyms": ["lista de temas","liste de thèmes","Themenliste","lista dei temi"]
+                                "synonyms": ["lista de temas","liste de thèmes","themenliste","lista dei temi"]
                             }
                         }
                     ]
@@ -498,7 +498,7 @@
                         {
                             "name": {
                                 "value": "start",
-                                "synonyms": ["comienzo","début","Start","inizio"]
+                                "synonyms": ["comienzo","début","start","inizio"]
                             }
                         }
                     ]
@@ -556,13 +556,13 @@
                         {
                             "name": {
                                 "value": "next theme",
-                                "synonyms": ["siguiente Tema","Thema suivante","nächste Thème","prossima Tema"]
+                                "synonyms": ["siguiente tema","thema suivante","nächste thème","prossima tema"]
                             }
                         },
                         {
                             "name": {
                                 "value": "another theme",
-                                "synonyms": ["otra Tema","autre Thema","andere Thème","altra Tema"]
+                                "synonyms": ["otra tema","autre thema","andere thème","altra tema"]
                             }
                         }
                     ]
@@ -585,7 +585,7 @@
                         {
                             "name": {
                                 "value": "themes",
-                                "synonyms": ["temas","thèmes","Themen","temi"]
+                                "synonyms": ["temas","thèmes","themen","temi"]
                             }
                         },
                         {
@@ -614,7 +614,7 @@
                         {
                             "name": {
                                 "value": "Theme",
-                                "synonyms": ["Tema","Thema","Thème","Tema"]
+                                "synonyms": ["tema","thema","thème","tema"]
                             }
                         },
                         {
