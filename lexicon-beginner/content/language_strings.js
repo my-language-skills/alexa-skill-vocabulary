@@ -201,11 +201,11 @@ module.exports = {
             {
                 language: "spanish",
                 welcome: "Dí, aprender, y el idioma. Dí, lista de idiomas, para obtener todos los idiomas que hay diponibles. ",
-                show_categories: "Di, mostrar categorías, o, mostrar subcategorías, para ver la lista completa de categorias o subcategorias disponibles. ",
+                show_categories: "Di, mostrar temas, o, mostrar topics, para ver la lista completa de temas o topics disponibles. ",
                 select_categories: "Di, aleagorio, para obtener el próximo ejemplo aleagorio. Di, próximo, para recibir el siguiente ejempl de la lista según su orden. Dí subcategría actual para ver en que subcagetoría estamos. Dí próxima categorá para cambiar a la próxima categoría. ",
                 example: "Dí aleatorio para obtener el próxmo ejemplo aleatorio. Say next to give next in order example. View current example by saying view example. ",
                 details: "Dí el nombre del idioma, y luego, palabra, o, frase. ",
-                reset: "Dí, lista de categorías, para obtener la lista de categorías disponibles. ",
+                reset: "Dí, lista de temas, para obtener la lista de los temas disponibles. ",
                 resume: "Continua desde donde lo dejaste la vez anterior. Dí, temas, para acceder a la lista de temas. ",
                 index: "Dí, próximo, o, aleatorio, para continuar con el próximo ejemplo. Dí, topic actual, para obtener el topic en el que estás estudiando. "
             }
