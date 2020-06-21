@@ -287,12 +287,17 @@
                         "lernen {language}",
                         "imparare {language}",
                         "change {language_type} language to {language}",
-                        "cambia  {language_type} lingua to {language}",
+                        "cambia la lengua {language_type} a {language}",
                         "ändere {language_type} sprache to {language}",
-                        "cambio {language_type} lengua to {language}",
-                        "changer  {language_type} langue  to {language}",
+                        "cambia {language_type} lengua to {language}",
+                        "changer {language_type} langue  to {language}",
+                        "change {language_type} idiom to {language}",
+                        "cambia el idioma {language_type} a {language}",
+                        "ändere {language_type} idiom to {language}",
+                        "cambia il linguaggio {language_type} to {language}",
+                        "changer {language_type} langage  to {language}",
                         "{language_type} language to {language}",
-                        "{language_type} lingua to {language}",
+                        "lengua {language_type} a {language}",
                         "{language_type} sprache to {language}",
                         "{language_type} lengua to {language}",
                         "{language_type} langue to {language}"
@@ -347,7 +352,7 @@
                         {
                             "name": {
                                 "value": "slower",
-                                "synonyms": ["más lento","ralentissez","langsamer","più lentamente"]
+                                "synonyms": ["más despacio","ralentissez","langsamer","più lentamente"]
                             }
                         }
                     ]
@@ -358,13 +363,13 @@
                         {
                             "name": {
                                 "value": "louder",
-                                "synonyms": ["mas fuerte","plus fort","lauter","più forte"]
+                                "synonyms": ["más alto","plus fort","lauter","più forte"]
                             }
                         },
                         {
                             "name": {
                                 "value": "quieter",
-                                "synonyms": ["más tranquilo","plus tranquille","leiser","più tranquillo"]
+                                "synonyms": ["más bajo","plus tranquille","leiser","più tranquillo"]
                             }
                         }
                     ]
@@ -428,7 +433,7 @@
                         {
                             "name": {
                                 "value": "native language",
-                                "synonyms": ["lengua materna","langue maternelle","muttersprache","lingua nativa"]
+                                "synonyms": ["lengua nativa","langue maternelle","muttersprache","lingua nativa"]
                             }
                         },
                         {
@@ -440,7 +445,7 @@
                         {
                             "name": {
                                 "value": "learning language",
-                                "synonyms": ["aprendiendo idioma","apprendre une langue","sprache lernen","apprendimento della lingua"]
+                                "synonyms": ["lengua de aprendizaje","apprendre une langue","sprache lernen","apprendimento della lingua"]
                             }
                         },
                         {
@@ -498,7 +503,7 @@
                         {
                             "name": {
                                 "value": "start",
-                                "synonyms": ["comienzo","début","start","inizio"]
+                                "synonyms": ["comenzar","début","start","inizio"]
                             }
                         }
                     ]

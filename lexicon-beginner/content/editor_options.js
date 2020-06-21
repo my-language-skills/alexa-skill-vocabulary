@@ -54,7 +54,7 @@ module.exports = {
             {
                 language: "spanish",
                 faster: "más rápido",
-                slower: "más lento",
+                slower: "más despacio",
             },
             {
                 language: "french",
@@ -156,9 +156,9 @@ module.exports = {
                 current_subcategory: "subcategoría actual",
                 current_topic: "topic actual",
                 current_example: "ejemplo actual",
-                native_language: "lengua materna",
+                native_language: "lengua nativa",
                 mother_language: "lengua materna",
-                learning_language: "aprendiendo idioma",
+                learning_language: "lengua de aprendizaje",
                 language_list: "lista de idiomas",
                 category_list: "Lista de categorias",
                 theme_list: "lista de temas",
@@ -246,7 +246,7 @@ module.exports = {
                 language: "spanish",
                 another: "Otro",
                 next: "siguiente",
-                start: "comienzo",
+                start: "empezar",
             },
             {
                 language: "french",

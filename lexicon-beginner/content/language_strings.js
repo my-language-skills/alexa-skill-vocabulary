@@ -200,7 +200,7 @@ module.exports = {
             },
             {
                 language: "spanish",
-                welcome: "Dí, aprender, y el idioma. Dí, lista de idiomas, para obtener todos los idiomas que hay diponibles. ",
+                welcome: "Dí, aprender, y, el idioma. Dí, lista de idiomas, para obtener todos los idiomas que hay disponibles. ",
                 show_categories: "Di, mostrar temas, o, mostrar topics, para ver la lista completa de temas o topics disponibles. ",
                 select_categories: "Di, aleagorio, para obtener el próximo ejemplo aleagorio. Di, próximo, para recibir el siguiente ejempl de la lista según su orden. Dí subcategría actual para ver en que subcagetoría estamos. Dí próxima categorá para cambiar a la próxima categoría. ",
                 example: "Dí aleatorio para obtener el próxmo ejemplo aleatorio. Say next to give next in order example. View current example by saying view example. ",
@@ -224,7 +224,7 @@ module.exports = {
                 learning_selection: "Learning language change to ",
                 native_warn: "Native language is already set to ",
                 learning_warn: "Learning language is already set to ",
-                reset: "Themes and topics are reset. Select a, theme and a topic and say, start. ",
+                reset: "Themes and topics are reset. Select a theme and a topic, and say, start. ",
                 given_request: "Request must be given in English but received it in ",
                 content_error: "Something wrong with the skill's content information. Please try again. ",
                 name_not_found: " doesn't exist in my available list .",
