@@ -116,7 +116,7 @@ module.exports = {
             },
             {
                 language: "french",
-                help: "Aidez-moi",
+                help: "Aidez moi",
                 instructions: "instructions",
                 options: "options",
             },
